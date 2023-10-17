@@ -1,0 +1,7 @@
+*** SQL Server ***
+1. Sql Server
+2. SQL Server Management Studio
+
+*** My SQl Server ***
+1. My SQL Server
+2. My SQL Workbench

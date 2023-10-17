@@ -1,0 +1,213 @@
+* Code thủ * 
+
+* JVM, JRE, JDK?
+	* Mã java sẽ được biên dịch thành bytecode thay vì mã máy như các ngôn ngữ khác.
+	* JVM (java virtual machine) chịu trách nhiệm chuyển đổi bytecode thành mã máy tại thời điểm chạy, giúp ứng dụng java
+	của bạn có thể chạy trên mọi hệ điều hành, điều này tạo nên tính độc lập của nền tảng java.
+	* JVM chưa đủ để chạy ứng dụng java, cần phải có những thư viện nữa
+	* JRE (java runtime environemt) chứa JVM và tất cả các thư viện cần thiết để chạy ứng dụng java.
+	* JDK (java development kit) chứa JRE, và bổ sung thêm các bộ công cụ để phát triển ứng dụng java, bao gồm trình biên dịch
+	để chuyển mã nguồn thành bytecode, các thư viện để phát triển giao diện người dùng, debugger.
+	* nếu chỉ muốn chạy một chương trình java, JRE là đủ, nhưng nếu muốn phát triển và triển khai ứng dụng java, bạn cần JDK
+	
+	* JVM, JRE và JDK là ba khái niệm quan trọng trong ngôn ngữ lập trình Java mà bất kỳ lập trình viên nào cũng cần biết.
+	JVM (Java Virtual Machine) là một máy ảo, chịu trách nhiệm chuyển đổi bytecode (được biên dịch từ mã nguồn Java) thành
+	mã máy của hệ thống cụ thể, giúp ứng dụng Java có thể chạy trên nhiều nền tảng khác nhau mà không cần chỉnh sửa.
+	JRE (Java Runtime Environment) cung cấp môi trường cần thiết để thực thi ứng dụng Java, bao gồm JVM và các thư viện đi kèm.
+	Còn JDK (Java Development Kit) không chỉ chứa JRE mà còn bổ sung các công cụ phát triển như trình biên dịch,
+	giúp lập trình viên có thể viết và biên dịch ứng dụng Java một cách hiệu quả.
+
+* Abstract class và Interface?
+	* abstract class là một lớp trừu tượng không hoàn toàn, nó chứa các phương thức trừu tượng và cụ thể, và không thể
+	khởi tạo trực tiếp, phải khởi tạo thông qua một lớp con extend abstract class.
+	* interface là một lớp trừu tượng hoàn toàn, chỉ chứa field và phương thức trừu tượng, cũng không thể khởi tạo, phải
+	thông qua một class implement interface class.
+	* một class có thể implement nhiều interface nhưng chỉ extend một abstract class.
+
+* Functional interface ? là interface chỉ có duy nhất một phương thức trừu tượng.
+* Lambda Expression được giới thiệu trong java8, đơn giản hóa cách triển khai của functional interface. thay vì khai báo lớp
+để triển khai functional interface, thì chỉ cần khai báo cách triển khai phương thức của functional interface và sử dụng nó
+không thông qua lớp nào hết.
+
+* Generics là một tính năng trong java cho phép bạn định nghĩa một class or interface theo cách mà có thể hoạt động theo
+nhiều kiểu dữ liệu khác nhau mà vẫn đảm bảo an toàn cho kiểu dữ liệu (type safety), giúp tái sử dụng code.
+
+* Shadow: là một trường hợp trong java miêu tả việc khi tham số truyền vào phương thức có cùng tên với thuộc tính của lớp,
+khi muốn sử dụng thuộc tính của lớp trong phương thức, java không biết là bạn muốn sử dụng thuộc tính hay tham số của phương
+thức, theo mặc định, java sẽ ưu tiên tham số (biến cục bộ) hơn, và điều này làm cho thuộc tính bị shadow. Và đây là mục đích
+chính của từ khóa 'this' trong java, 'this.<tên thuộc tính>' sẽ làm cho thuộc tính không còn bị shadow, java biết là bạn muốn
+sử dụng thuộc tính của lớp. Một lưu ý nhỏ, khi bạn khởi tạo một đối tượng có sử dụng 'this', this ở đây là tham chiếu tới đối
+tượng hiện tại, nghĩa là this không thuộc về lớp, mà thuộc về đối tượng, nên this không thể dử dụng trong phương thức static,
+bới vì phương thức static thuộc về lớp, và this sẽ không biết tham chiếu tới đối tượng nào. done.
+
+* Super: là từ khóa để gọi đến contructor, properties và method của lớp cha. khi bạn khởi tạo một object, mà object này extend
+từ một lớp cha, thì java sẽ khởi tạo object cha trước khi khởi tạo object con, nghĩa là java sẽ phải gọi đến contructor của
+lớp cha, nhưng gọi ở đâu?, java sẽ gọi constructor của lớp cha trong constructor của lớp con. theo mặc định java sẽ gọi 
+defaul constructor, java sẽ đặt lệnh sau ngay đầu tiên của constructor lớp con 'super();', đây là lệnh java gọi default constructor
+của lớp cha. nếu bạn muốn gọi một constructor chứa tham số của lớp cha, bạn có thể truyền tham số vào super().
+Ví dụ 'super(name, age);' nhớ là phải luôn đặt ở đầu constructor con, nếu không java sẽ báo lỗi. ghi nhớ là bạn chỉ có thể gọi
+constructor cha trong constructor con, bạn không thể gọi bên ngoài constructor con được.
+Bạn cũng có thể gọi các properties và method của lớp cha thông qua super, ví dụ 'super.printer()'.
+
+* Nói thêm về interface, mọi properties trong interface đều là public, static, final. mọi method trong interface đều là public
+abstract. nhưng trong java8, một method mới được bổ sung vào interface là default method, defaul method là method đã triển khai.
+điều này làm cho interface linh hoạt hơn nhiều, giống abstract class nhỉ.
+
+* Bàn luận về hàm main trong java: hàm main là hàm được chạy đầu tiên khi chương trình khởi chạy.
+	* public static void main(String[] args){}
+	* Hàm main trong nhất thiết nằm trong Main class, nhưng nó phải là duy nhất trong chương trình.
+	* public: nó có thể được truy cập mọi nơi trong chương trình.
+	* static: nó có thể được chương trình gọi đầu tiên mà không cần khởi tạo lớp.
+	* void: nó không trả về gì cả.
+	* String[] args: là command line argument, đây là một mảng string được truyền vào khi khởi chạy, ví dụ khi bạn muốn đọc
+	một tên file khi khởi chạy, bạn cần truyền vào là lấy ra tại args[0].
+
+* Bàn luận về cách chạy chương trình java
+	* javac <name>.java : lệnh javac sẽ sử dụng trình biên dịch trong jdk để biên dịch mã nguồn sang bytecode, bạn sẽ thấy
+	một <name>.class được tạo ra trong cùng thư mục.
+	* java <name> : jvm sẽ chuyển <name>.class thành mã máy phù hợp với hệ điều hành để chạy chương trình.
+	* ví dụ, bạn muốn truyền file test.txt vào command line argument, và bạn có class Main chứa hàm main. làm như sau
+		* javac Main.java -> tạo ra Main.class
+		* java Main test.txt -> truyền test.txt vào String[] args, tại vị trí 0, và chạy chương trình.
+	
+* Bàn về Method overloading: làm sao java biết là mình gọi đến method nào khi nhiều method overloading tên giống nhau.
+	* Java sẽ dưạ vào method signature bào gồm : Tên + Kiểu & số lượng tham số.
+	* Mỗi method có signature khác nhau thì overloading hợp lệ.
+	
+* Bàn về inner class: inner class là lớp được được khai báo trong lớp, hay còn gọi là lớp trong.
+	* lớp bên trong có thể truy cập các thuốc tính và phương thức của lớp bên ngoài dù là private.
+	* muốn khởi tạo lớp trong bạn có hai cách:
+		* cách 1 là khởi tạo lớp bên ngoài và khởi tạo lớp bên trong.
+		* cách hai là bạn đánh dấu lớp bên trong là static, bạn có thể khởi tạo lớp bên trong mà trong cần khởi tạo lớp
+		bên ngoài, nhưng điều này làm hạn chế việc truy cập thuộc tính và phương thức của lớp bên ngoài, vì là static nên
+		lớp bên trong chỉ có thể truy cập được thuốc tính và phương thức static của lớp bên ngoài, vì các thuộc tính và 
+		phương thức của lớp bên ngoài không phải static sẽ không đc khởi tạo khi chưa khởi tạo lớp bên ngoài.
+		
+* Bàn về anoymous class (lớp vô danh): là lớp con được tạo ra kế thừa lớp cha ngay trong câu lệnh mà ko cần thiết kế lớp con.
+	* dùng để triển khai interface hoặc abstract class không thông qua lớp con.
+	* nhưng lớp vô danh không thể triển khai nhiều interface như lớp con và kế thừa luôn abstract class như lớp con.
+	* lớp vô danh không có tên.
+	* chỉ sử dụng được trong block code khai báo lớp vô danh đó. muốn sử dụng ở block code khác phải khai báo lại.
+
+* Bàn về overiding:
+	* không thể ghi đè phương thức final hoặc static, vì nó thuộc về lớp và không thay đổi được.
+	* access modifier của phương thức ghi đè không được hẹp hơn phương bị ghi đè
+	* tên, kiểu trả về , access modifier và kiểu tham số của phương ghi đè phải giống hệt phương thức bị ghi đè.
+	* hai class phải có một quan hệ cha con mới ghi đè được cho nhau.
+	
+* Bàn luận về array:
+	* mảng dùng để lưu trữ nhiều giá trị có cùng kiểu dữ liệu, có độ dài cố định và bắt đầu từ 0;
+	* ví dụ int[] a = new int[5]; hoặc int[] a = {1,2,3,4,5}
+	* với int, khi không gắn giá trị cho các ô nhớ trong mảng, thì mặc định java set là 0, với object là null.
+	* mảng cũng là một reference type, lưu trữ địa chỉ bắt đầu của dãy ô nhớ. và dãy ô nhớ đc lưu bên heap.
+
+* Bàn về enum (enumeration): là một kiểu dữ liệu đặc biệt cho phép mình tạo ra một tập hợp các giá trị được định sẵn và không
+	thay đổi.
+	* Điều thú vị về enum.
+	* Bạn có thể tạo constructor cho enum như các class khác, nhưng khi tạo một field mới và set field này vào constructor
+	bạn sẽ thấy java báo lỗi ở các Giá trị trong enum, đó là bởi bị mỗi giá trị của enum chính là một instance của enum,
+	tức là bạn sẽ phải truyền tham số vào từng giá trị như gọi một constructor vậy.
+	* lưu ý, thuộc tính trong enum phải được khai báo final, vì mục đích của enum là giữ cho giá trị không thay đổi.
+
+* Bàn về wrapper class: là một lớp bao giúp chúng ta sử dụng kiểu dữ liệu nguyên thủy như là kiểu dữ liệu tham chiếu.
+	điểm đặc biệt của reference data type là nó cung cấp các phương thức để thao tác với primitive data type.
+	* int -> Interger; float -> Float; char -> Charater; ...
+	* một lưu ý nhỏ, String là một reference data type nhưng nó lại không phải là một wrapper class, bởi vì nó bao lấy 
+	một mảng char, chứ không phải là một giá trị nguyên thủy duy nhất.
+	* Bạn có thể khởi tạo giá trị cho wrapper class thông qua constructor của nó
+	ví dụ: Interger x = new Interger(5); nhưng cách này đã bị java delegate, không khuyến nghị dùng.
+	* Bạn có thể khởi tạo qua phương thức valueOf(value) của wrapper class -> gọi là boxing.
+	* Bạn có thể khởi tạo trực tiếp cho wrapper class như sau: Interger x = 8; -> gọi là autoboxing.
+	* Nhưng autoboxing không hoàn toàn thay thế cho boxing, ví dụ Boolean = true -> đúng; Boolean = 'true' -> sai;
+		Boolean = Boolean.valueOf('true') -> đúng; đây là thế mạnh của boxing.
+	* Và tất nhiên cũng có unboxing và auto unboxing;
+		* int x = Diem.intVlaue(); -> unboxing
+		* int x = Diem -> auto unboxing;
+	
+	* Một điều phải biết nếu muốn trở thành pro developer
+		* Cơ chế Interger Cahing.
+		* Khi khởi tạo Interger in1 mà có giá trị từ -128 đến 127, java sẽ lưu object đó vào bộ nhớ cache.
+		* Khi bạn khởi tạo một Interger in2 nưã có cùng giá trị, thì nó java cũng điều Interger tham chiếu đến object đã lưu
+		trữ trước đó. nên khi so sánh in1 == in2, nó không so sánh giá trị mà là so sánh địa chỉ ô nhớ tham chiếu tới.
+		* nên khi khai báo Interger nằm ngoài khoảng -128 đến 127, với cùng giá trị nhưng java sẽ tạo hai object khác nhau để lưu
+		giá trị cho hai Interger, vì thế khi so sánh hai Interger với ==, thì sẽ false bởi vì đây là so sánh hai địa chỉ khác nhau.
+		* để giải quyết vấn đề này, bạn phải dùng phương thức equal() của wrapper class, nó sẽ tự động unboxing để lấy giá trị nguyên
+		thủy để so sánh, nên khi so sánh hai wrapper class, bạn phải sử dụng equal();
+		* Các kiểu Float, Double cũng có cơ chế caching. 
+		
+	* Khi nào dùng wrapper class;
+		* Khi dùng java collection; bởi vì các collection chỉ chấp nhận reference data type.
+		* Khi bạn muốn lưu giá trị null cho biến mà primitive data type không thể lưu giá trị null;
+		* Khi bạn muốn sử dụng các phương thức của object ví dụ như equal(), compareTo(), toString() ...; mà các primitive không có.
+		
+		* ngoài những lý do trên, bạn ko nên dùng wrapper class vì nó có thể làm chậm chương trình của bạn như quá trình
+		boxing và unboxing sẽ tốn time cpu.
+		
+* Bàn về String: String trong java không phài primitive data type, mà là reference data type, và String là inmutable.
+	Tức là không thay đổi.
+	* Dành cho ai chưa biết biến nguyên thủy sẽ lưu trữ trực tiếp giá trị dưới dạng nhị phân và được lưu trong stack.
+	Còn biến tham chiếu là biến lưu địa chỉ của ô nhớ mà lưu trữ đối tượng.
+	* Ví dụ, khi khai báo String x = 'thien', biến x sẽ được lưu trong stack và lưu địa chỉ đối tượng String,
+	và đối tượng String với value là 'thien' sẽ được lưu trong bộ nhớ heap, và nằm trong string pool.
+	Khi bạn khai báo một biến mơi String y = 'thien', java sẽ vào spring pool xem có đối tượng String nào có giá như vậy không,
+	nếu có, y sẽ lưu địa chỉ đối tượng có sẵn trong string pool chứ không khởi tạo một đối tượng String mới.
+	* Đó, inmutable giúp tiết kiệm bộ nhớ là như v đó.
+	* tại sao lại lưu đối tượng String trong string pool, string pool là một khoảng bộ nhớ trong heap đc java dành ra để
+	lưu các đối tượng string, và các đối tượng string trong string pool không được có giá trị trung lặp nhau, điều này giúp
+	java tìm kiếm đối tượng string dễ dàng và làm cho String là inmutable, nếu String không inmutable thì cũng không có string pool.
+	* lưu ý, khi bạn tạo String z = new String('thien') thì java sẽ khởi tạo một đối tượng hoàn toàn mới nằm ngoài string pool.
+
+* Bàn về checkException và uncheck Exception.
+	* checkException là các exception được check tại compile time, các ide sẽ hỗ trợ việc này. và các checkException extend
+	từ Exception. (IOException, SQLExeption)
+	* uncheck Exception là các exception extend từ runtimeException, nghĩa là không bị check tại thời điểm biên dịch, mà
+	có thể gây lỗi tại runtime. (NullPointerExeption, IndexOutOfBoundException).
+
+* Bàn về throw và throws
+	* throw để tạo ra một ngoại lệ cụ thể và ném ra khỏi phương thức hiện tại.
+		* bình thường dùng try-catch để ném ngoại lệ, nhưng bạn có thể tự tạo ngoại lệ để ném ra.
+		* các bược tạo một ngoại lệ cụ thể:
+			* Đảm bảo không để java ném ngoại lệ mặc định.
+			* Thiết kế một exception extend runtimeException.
+			* Ném nó bằng code.
+	* throws để nói rằng phương thức này có thể gây ra một hoặc nhiều ngoại lệ. dùng khi khai báo phương thức.
+		* nếu phương thức có throws <exception> thì khi gọi đến phương thức này phải xử lý những exception mà phương thức
+		này có thể ném ra, dùng try-catch hoặc có thể throws ra tiếp cho tầng khác xử lý. (ducking exception).
+		* một lưu ý quan trọng, throws thường được dùng với checkException, vì khi throws checkException ide mới bắt bạn phải
+		xử lý luôn exception này, khi throws uncheck Exception, ide không bắt bạn phải xử lý luôn mà chỉ thông báo cho bạn biết
+		là có thể có exception.
+
+* Bàn luận về hashCode() và equal().
+	* hashCode() thường được sử dụng trong cấu trúc dữ liệu có sử dụng mã hash.
+	* ví dụ với Hashet:
+		* khi lưu một đối tượng tự thiết kế vào Set, trong Set các object sẽ không được lưu tuần tự, mà dựa vào mã hash được
+		sinh ra từ hashCode() mặc định, rồi mỗi mã hash sẽ đánh dấu cho một ô trong bucket.
+		* note: các cấu trúc có sử dụng hash lưu đối tượng trong một bucket, một khoảng nhớ trong heap.
+		* phương thức equal() có nhiệm vụ so sánh các giá trị của đối tượng với nhau.
+		* đối với các class mà java tự viết ra, ta không cần override lại hashCode() và equal(), nhưng đối với các class mà
+		ta tự thiết kế, ta phải override lại hashcode() và equal để chạy đúng với ý định của ta.
+
+* Bàn về primitive type và reference type.
+	* khi khởi chạy chương trình, mọi biến và function sẽ được load lên ram, và ram chia thành hai phần chính là stack và heap.
+	* biến primitive là biến lưu giá trị trực tiếp và lưu ở stack.
+	* biến reference là biến lưu địa chỉ của đối tượng, biến thì lưu ở stack, đối tượng thì lưu ở heap.
+
+* Bàn về string pool.
+	* String cũng là reference type, nó không lưu giá trị mà là lưu địa chỉ của một mảng byte.
+	* string pool là một phần ô nhớ được java dành ra để lưu các String được khai báo cứng.
+	* khai báo cứng là autoboxing, ví dụ String name = 'thien'.
+	* trong spring pool không thể tồn tại các giá trị trùng lặp, string pool dùng equal() của String để so sánh, tạo string
+	mới nếu chưa tồn tại và ngược lại.
+	* nếu khai báo với từ khóa new, thì object String này không được khởi tạo trong string pool. nó giống như reference type
+	bình thường.
+
+* Bàn về cấu trúc dữ liệu Set.
+	* Set dùng một bucket để lưu trữ các object, mỗi ô nhớ trong bucket sẽ tương ứng với một mã hash được tạo ra phụ thuộc
+	theo tứng đối tượng.
+	* khi thêm phần tử vào set, java sẽ dùng hashcode để lấy mã hash rồi lưu vào ô nhớ tương ứng.
+	* hai object có các value giống nhau sẽ sinh ra mã hash giống nhau, lưu ý, chỉ áp dụng với class mà java tạo ra, đối
+	với các class mà bạn tự thiết kế, bạn phải override lại hashCode() để tạo ra mã hash giống nhau cho đối tượng giống nhau,
+	nếu không, hashcode() mặc định sẽ sinh ra mã hash khác nhau cho đối tượng giống nhau cho class mình tự thiết kế.
+	* equal() cũng tương tự như hashcode(), bạn phải override lại nếu muốn nó chạy đúng.
+	* khi mã hash giống nhau, java sẽ tìm trong ô nhớ có mã hash đó rồi dùng equal để kiểm tra xem mã có trùng các giá trị
+	trong object không, nếu true thì không tạo đối tượng mới, nếu false thì lưu vào ô nhớ có mã hash đó.

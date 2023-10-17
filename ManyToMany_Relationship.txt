@@ -1,0 +1,275 @@
+Dưới đây là bản dịch của bài viết sang tiếng Việt:
+
+1. Tổng quan
+Trong bài hướng dẫn này, chúng ta sẽ xem nhiều cách để xử lý mối quan hệ nhiều-nhiều (many-to-many) bằng JPA.
+
+Chúng ta sẽ sử dụng mô hình sinh viên, khóa học và các mối quan hệ khác nhau giữa chúng.
+
+Vì tính đơn giản, trong các ví dụ mã code, chúng tôi chỉ hiển thị các thuộc tính và cấu hình JPA liên quan đến các mối quan hệ nhiều-nhiều.
+
+2. Cơ bản Many-to-Many
+2.1. Thiết kế mối quan hệ Many-to-Many
+Mối quan hệ là một kết nối giữa hai loại thực thể. Trong trường hợp mối quan hệ nhiều-nhiều, cả hai bên có thể liên kết với nhiều thể hiện của bên kia.
+
+Chúng ta có thể có mô hình ví dụ của sinh viên đánh dấu các khóa học họ thích.
+
+Một sinh viên có thể thích nhiều khóa học và nhiều sinh viên có thể thích cùng một khóa học:
+
+Ví dụ đơn giản
+Như chúng ta biết, trong RDBMS, chúng ta có thể tạo các mối quan hệ với các khóa ngoại. Vì cả hai bên đều có thể tham chiếu đến nhau, chúng ta cần tạo một bảng riêng để chứa các khóa ngoại:
+
+Mô hình đơn giản được cập nhật
+Bảng như vậy được gọi là bảng liên kết (join table). Trong bảng liên kết, sự kết hợp của các khóa ngoại sẽ là khóa chính ghép nối của nó.
+
+2.2. Cài đặt trong JPA
+Thiết kế mối quan hệ nhiều-nhiều với POJOs rất dễ dàng. Chúng ta nên bao gồm một Collection trong cả hai lớp, chứa các phần tử của lớp còn lại.
+
+Sau đó, chúng ta cần đánh dấu lớp đó bằng @Entity và khóa chính bằng @Id để biến chúng thành các thực thể JPA thích hợp.
+
+Ngoài ra, chúng ta nên cấu hình loại mối quan hệ. Do đó, chúng ta đánh dấu các collection bằng @ManyToMany:
+
+@Entity
+class Student {
+
+    @Id
+    Long id;
+
+    @ManyToMany
+    Set<Course> likedCourses;
+
+    // các thuộc tính bổ sung
+    // constructors, getters, và setters tiêu chuẩn
+}
+
+@Entity
+class Course {
+
+    @Id
+    Long id;
+
+    @ManyToMany
+    Set<Student> likes;
+
+    // các thuộc tính bổ sung
+    // constructors, getters, và setters tiêu chuẩn
+}
+Bên cạnh đó, chúng ta cần cấu hình cách mô hình mối quan hệ trong RDBMS.
+
+Bên chủ sở hữu (owner side) là nơi chúng ta cấu hình mối quan hệ. Chúng ta sẽ sử dụng lớp Student.
+
+Chúng ta có thể làm điều này bằng cách sử dụng @JoinTable trong lớp Student. Chúng ta cung cấp tên của bảng liên kết (course_like) cũng như các khóa ngoại bằng các @JoinColumn. Thuộc tính joinColumn sẽ kết nối với bên chủ sở hữu của mối quan hệ, và inverseJoinColumn
+
+ sẽ kết nối với bên kia:
+
+@ManyToMany
+@JoinTable(
+  name = "course_like", 
+  joinColumns = @JoinColumn(name = "student_id"), 
+  inverseJoinColumns = @JoinColumn(name = "course_id"))
+Set<Course> likedCourses;
+Lưu ý rằng việc sử dụng @JoinTable hoặc ngay cả @JoinColumn cũng không bắt buộc. JPA sẽ tự động tạo các tên bảng và cột cho chúng ta. Tuy nhiên, chiến lược JPA sử dụng không luôn luôn phù hợp với các quy ước đặt tên chúng ta sử dụng. Vì vậy, chúng ta cần khả năng cấu hình tên bảng và cột.
+
+Trên bên đích, chúng ta chỉ cần cung cấp tên trường, mà ánh xạ mối quan hệ.
+
+Do đó, chúng ta đặt thuộc tính mappedBy của @ManyToMany trong lớp Course:
+
+@ManyToMany(mappedBy = "likedCourses")
+Set<Student> likes;
+Chú ý rằng vì mối quan hệ nhiều-nhiều không có bên chủ sở hữu trong cơ sở dữ liệu, chúng ta có thể cấu hình bảng liên kết trong lớp Course và tham chiếu nó từ lớp Student.
+
+3. Many-to-Many Sử dụng Composite Key
+3.1. Thiết kế các thuộc tính của Mối quan hệ
+Giả sử chúng ta muốn cho phép sinh viên đánh giá các khóa học. Một sinh viên có thể đánh giá bất kỳ số lượng khóa học nào và bất kỳ số lượng sinh viên nào có thể đánh giá cùng một khóa học. Do đó, đây cũng là một mối quan hệ nhiều-nhiều.
+
+Những gì làm cho ví dụ này phức tạp hơn chút là có nhiều hơn mối quan hệ tồn tại trong mối quan hệ. Chúng ta cần lưu trữ điểm đánh giá mà sinh viên đã đưa ra cho khóa học.
+
+Chúng ta có thể lưu trữ thông tin này ở đâu? Chúng ta không thể đặt nó trong lớp Student vì một sinh viên có thể đưa ra các đánh giá khác nhau cho các khóa học khác nhau. Tương tự, việc lưu trữ nó trong lớp Course cũng không phải là giải pháp tốt.
+
+Đây là một tình huống khi mối quan hệ chính nó có một thuộc tính.
+
+Sử dụng ví dụ này, gắn một thuộc tính vào một mối quan hệ nhìn như thế này trong sơ đồ ER:
+
+Quan hệ có thuộc tính ER
+Chúng ta có thể mô hình nó gần giống như mối quan hệ nhiều-nhiều đơn giản. Sự khác biệt duy nhất là chúng ta gắn một thuộc tính mới vào bảng liên kết:
+
+Mô hình quan hệ thuộc tính được cập nhật
+3.2. Tạo một Composite Key trong JPA
+Việc triển khai mối quan hệ nhiều-nhiều đơn giản đã khá dễ dàng. Vấn đề duy nhất là chúng ta không thể thêm một thuộc tính vào mối quan hệ một cách đó vì chúng ta kết nối các thực thể trực tiếp. Do đó, chúng ta không có cách nào để thêm một thuộc tính vào mối quan hệ chính nó.
+
+Vì chúng ta ánh xạ các thuộc tính cơ sở dữ liệu vào các trường lớp trong JPA, chúng ta cần tạo một lớp thực thể mới cho mối quan hệ.
+
+Tất nhiên, mỗi thực thể JPA đều cần một khóa chính. Vì khóa chính của chúng tôi là một khóa ghép, chúng ta phải tạo một lớp mới để chứa các phần khác nhau của khóa:
+
+@Embeddable
+class Course
+
+RatingKey implements Serializable {
+
+    @Column(name = "student_id")
+    Long studentId;
+
+    @Column(name = "course_id")
+    Long courseId;
+
+    // constructors, getters, và setters tiêu chuẩn
+    // triển khai hashcode và equals
+}
+Chú ý rằng một lớp khóa ghép phải đáp ứng một số yêu cầu chính:
+
+Chúng ta phải đánh dấu nó bằng @Embeddable.
+Nó phải triển khai java.io.Serializable.
+Chúng ta cần cung cấp một triển khai của các phương thức hashcode() và equals().
+
+3.3. Sử dụng Composite Key trong JPA
+Sử dụng lớp khóa ghép này, chúng ta có thể tạo ra lớp thực thể, mô hình hóa bảng liên kết:
+
+@Entity
+class CourseRating {
+
+    @EmbeddedId
+    CourseRatingKey id;
+
+    @ManyToOne
+    @MapsId("studentId")
+    @JoinColumn(name = "student_id")
+    Student student;
+
+    @ManyToOne
+    @MapsId("courseId")
+    @JoinColumn(name = "course_id")
+    Course course;
+
+    int rating;
+    
+    // các thuộc tính bổ sung
+    // constructors, getters, và setters tiêu chuẩn
+}
+Mã này rất giống với triển khai một thực thể thông thường. Tuy nhiên, chúng ta có một số khác biệt chính:
+
+Chúng ta đã sử dụng @EmbeddedId để đánh dấu khóa chính, là một trường thể hiện của lớp CourseRatingKey.
+Chúng ta đã đánh dấu các trường student và course bằng @MapsId.
+@MapsId có nghĩa là chúng ta liên kết các trường đó với một phần của khóa, và chúng là các khóa ngoại của mối quan hệ nhiều-một.
+
+Sau đó, chúng ta có thể cấu hình các tham chiếu nghịch đảo trong các lớp Student và Course như trước:
+
+class Student {
+
+    // ...
+
+    @OneToMany(mappedBy = "student")
+    Set<CourseRating> ratings;
+
+    // ...
+}
+
+class Course {
+
+    // ...
+
+    @OneToMany(mappedBy = "course")
+    Set<CourseRating> ratings;
+
+    // ...
+}
+Chú ý rằng có một cách thay thế khác để sử dụng khóa ghép: @IdClass annotation.
+
+3.4. Các Đặc điểm Khác
+Chúng ta đã cấu hình các mối quan hệ với các lớp Student và Course là @ManyToOne. Chúng ta có thể làm điều này vì với thực thể mới, chúng tôi phân hủy cấu trúc mối quan hệ nhiều-nhiều thành hai mối quan hệ một-nhiều.
+
+Tại sao chúng ta có thể làm điều này? Nếu chúng ta xem xét các bảng cẩn thận trong trường hợp trước đó, chúng ta có thể thấy rằng nó chứa hai mối quan hệ một-nhiều. Nói cách khác, không có mối quan hệ nhiều-nhiều nào trong một RDBMS. Chúng ta gọi các cấu trúc chúng ta tạo ra bằng bảng liên kết là mối quan hệ nhiều-nhiều vì đó là điều chúng ta mô hình.
+
+Bên cạnh đó, nó rõ ràng hơn nếu chúng ta nói về các mối quan hệ nhiều-nhiều vì đó là ý định của chúng ta. Trong khi đó, bảng liên kết chỉ là một chi tiết triển khai; chúng ta không quan trọng thật sự về nó.
+
+Hơn nữa, giải pháp này có một tính năng bổ sung mà chúng ta chưa đề cập. Giải pháp nhiều-nhiều đơn giản tạo ra mối quan hệ giữa hai thực thể. Do đó, chúng ta không thể mở rộng mối quan hệ đến nhiều thực thể hơn. Nhưng chúng ta không có giới hạn này trong giải pháp này: chúng ta có thể mô hình mối quan hệ giữa bất kỳ số lượng loại thực thể nào.
+
+Ví
+
+ dụ, khi nhiều giáo viên có thể dạy cùng một khóa học, sinh viên có thể đánh giá cách một giáo viên cụ thể dạy một khóa học cụ thể. Như vậy, một đánh giá sẽ là mối quan hệ giữa ba thực thể: một sinh viên, một khóa học và một giáo viên.
+
+4. Many-to-Many Với một Thực thể Mới
+4.1. Thiết kế các thuộc tính của Mối quan hệ
+Giả sử chúng ta muốn cho phép sinh viên đăng ký các khóa học. Ngoài ra, chúng ta cần lưu trữ điểm thời gian sinh viên đăng ký cho một khóa học cụ thể. Hơn nữa, chúng ta muốn lưu trữ điểm sinh viên nhận được trong khóa học.
+
+Trong một thế giới lý tưởng, chúng ta có thể giải quyết vấn đề này với giải pháp trước, trong đó chúng ta có một thực thể với một khóa ghép. Tuy nhiên, thế giới không phải lúc nào cũng là lý tưởng, và sinh viên không luôn luôn hoàn thành một khóa học trong lần đầu tiên.
+
+Trong trường hợp này, có nhiều kết nối giữa các cặp sinh viên-khóa học giống nhau, hoặc nhiều hàng, có cùng các cặp student_id-course_id. Chúng ta không thể mô hình nó bằng bất kỳ giải pháp trước nào vì tất cả các khóa chính phải là duy nhất. Vì vậy, chúng ta cần sử dụng một khóa chính riêng biệt.
+
+Do đó, chúng ta có thể giới thiệu một thực thể, mà sẽ chứa các thuộc tính của việc đăng ký:
+
+Quan hệ thực thể được cập nhật
+Trong trường hợp này, thực thể Registration đại diện cho mối quan hệ giữa hai thực thể còn lại.
+
+Vì nó là một thực thể, nó sẽ có một khóa chính riêng biệt.
+
+Trong giải pháp trước, hãy nhớ rằng chúng ta có một khóa chính ghép mà chúng ta tạo từ hai khóa ngoại.
+
+Bây giờ hai khóa ngoại sẽ không phải là một phần của khóa chính:
+
+Mô hình thực thể quan hệ đã được cập nhật
+4.2. Cài đặt trong JPA
+Vì course_registration trở thành một bảng thông thường, chúng ta có thể tạo ra một thực thể JPA đơn giản mô hình nó:
+
+@Entity
+class CourseRegistration {
+
+    @Id
+    Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    Course course;
+
+    LocalDateTime registeredAt;
+
+    int grade;
+    
+    // các thuộc tính bổ sung
+    // constructors, getters, và setters tiêu chuẩn
+}
+Chúng ta cũng cần cấu hình các mối quan hệ trong các lớp Student và Course:
+
+class Student {
+
+    // ...
+
+    @OneToMany(mappedBy = "student")
+    Set<CourseRegistration> registrations;
+
+    // ...
+}
+
+class Course {
+
+    // ...
+
+    @OneToMany(mappedBy = "course")
+    Set<CourseRegistration> registrations;
+
+    // ...
+}
+Một lần nữa, chúng ta đã cấu hình mối quan hệ trước đó, vì vậy chúng ta chỉ cần nói cho JPA biết nó có thể tìm thấy cấu hình đó ở đâu.
+
+Chúng ta cũng có thể sử dụng giải pháp này để giải quyết vấn đề trước đó của sinh viên đánh giá các khóa học. Tuy nhiên, c
+
+ảm giác là lạ khi tạo một khóa chính riêng biệt trừ khi chúng ta phải.
+
+Hơn nữa, từ quan điểm RDBMS, điều này không có nhiều ý nghĩa vì kết hợp hai khóa ngoại đã tạo thành một khóa ghép hoàn hảo. Ngoài ra, khóa ghép đó có một ý nghĩa rõ ràng: chúng ta kết nối những thực thể nào trong mối quan hệ.
+
+Nếu không, việc lựa chọn giữa hai cài đặt này thường chỉ là sở thích cá nhân. 
+
+5. Kết luận
+Trong bài viết này, chúng ta đã thấy một mối quan hệ nhiều-nhiều là gì và cách chúng ta có thể mô hình nó trong một RDBMS bằng cách sử dụng JPA.
+
+Chúng ta đã thấy ba cách mô hình nó trong JPA. Cả ba đều có những ưu và nhược điểm khác nhau khi đến các khía cạnh sau đây:
+
+- sự rõ ràng của mã
+- sự rõ ràng của cơ sở dữ liệu
+- khả năng gán thuộc tính cho mối quan hệ
+- số lượng thực thể chúng ta có thể liên kết với mối quan hệ
+- hỗ trợ cho nhiều kết nối giữa cùng một các cặp thực thể
+
+Như thường lệ, các ví dụ có sẵn trên GitHub.

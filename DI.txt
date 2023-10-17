@@ -1,0 +1,13 @@
+<<<< Dependency Injection >>>
+
+* Requirement: Need to understand what is Inversion Of Control and What is Spring IOC Container;
+
+* @Autowired Anotation: 
+	* Use to autowiring bean in to class managed my Spring;
+	* Cannot autowiring in non-managed class spring. How to handle it?
+		* Create a class implemet ApplicationContextAware (search for detail)
+
+* How Many Way To Inject Bean From Spring Container?
+	* There are 3 ways
+		* By field (not recommend by community): put @Autowired before field to autowiring;
+		* By Constructor( recommend ) : put @Autowired before constructor; in new version spring framwork, no need use @Autowired;

@@ -1,0 +1,33 @@
+
+* The Different between @NotNull and @NotBlank and @NotEmpty.
+@NotNull: a constrained CharSequence, Collection, Map, or Array is valid as long as it's not null, but it can be empty.
+@NotEmpty: a constrained CharSequence, Collection, Map, or Array is valid as long as it's not null, and its size/length is greater than zero.
+@NotBlank: a constrained String is valid as long as it's not null, and the trimmed length is greater than zero.
+
+@NotNull: có thể _dùng được cho hầu như tất cả các kiểu dữ liệu trong Java_, từ chối giá trị null hoặc không có nhưng chấp nhận giá trị rỗng. Note: Thậm chí annotation này có thể dùng được cho các kiểu dữ liệu nguyên thủy (int, long, float, double, char, byte...) mà không báo lỗi (mặc dù các kiểu nguyên thủy không thể null) nhưng mà nó sẽ không có tác dụng gì cả.
+
+@NotEmpty: có thể dùng được cho CharSequence (interface của String, StringBuffer và StringBuilder), Collection, Map, Array. Annotation này từ chối cả giá trị null lẫn giá trị rỗng bằng cách kiểm tra độ dài (length) (String) hoặc kích thước (size) (Collection) xem có lớn hơn 0 hay không.
+
+@NotBlank: có thể dùng được cho String. Annotation này từ chối String có giá trị null và String có độ dài là 0 sau khi đã trim (loại bỏ hết khoảng trắng thừa ở đầu và cuối của String)
+
+*
+=> @Size dùng để xác định kích thước (số lượng phần tử hoặc số ký tự) của trường (hoặc mảng, bộ sưu tập).
+=> @Length dùng để xác định số ký tự của trường (hoặc chuỗi).
+=> @Range dùng để xác định giá trị tối thiểu và tối đa của trường (áp dụng cho các loại dữ liệu có thể so sánh được như số nguyên, số thực).
+ ==>>> It All Works The Same;
+
+* Number Constraint
+=> @Negative: (Hibernate Validator)for Number and value have to be a negative number (nhỏ hơn 0).
+=> @NegativeOrZero: (Hibernate Validator)for Number and value have to be a negative number or equal to zero. (nhỏ hơn hoặc bằng 0)
+=> @Positive: (Hibernate Validator) for Numberand value have to be a positive number(lớn hơn 0).
+=> @PositiveOrZero: (Hibernate Validator) for Number and value have to be a positive number or equal to zero.(lớn hơn hoặc bằng 0).
+
+*
+=> @Digits: (Hibernate Validator) xác định số lượng chữ số tối đa sau dấu phẩy trong một số thập phân.
+	* Để sử dụng annotation @Digits, bạn cần cung cấp hai tham số:
+		* integer: Số chữ số tối đa trước dấu phẩy.
+		* fraction: Số chữ số tối đa sau dấu phẩy.
+
+=> @Future: (Hibernate Validator) for Time, must be future;
+=> @FutureOrPresent: (Hibernate Validator) for Time, must be future or present;
+=> @PastOrPresent: (Hibernate Validator) for Time, must be past or present;
