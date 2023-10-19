@@ -1,0 +1,15 @@
+* Github *
+
+* phân biệt git pull và git fecth.
+	* git fetch là một phiên bản an toàn hơn của git pull
+	* git pull origin <branch> = git fecth origin <branch> + git merge origin/<branch> <branch>
+	* với git pull, sẽ tải code từ remote về và merge luôn vào nhanh hiện tại, điều này có thể làm mất hoặc rối code của bạn
+	ở nhánh hiện tại nếu bạn chưa kịp commit những thay đổi.
+	* với lệnh git fetch: sẽ tải code về nhưng không merge vào nhánh hiện tại, code sẽ được lưu vào nhánh origin/<nhánh hiện tại>
+	* khi bạn muốn merge: bạn cần thủ công thực hiện merge code.
+
+* vấn đề phân nhánh nhưng lại cập nhật code ở cả hai nhánh.
+	* ví dụ: bạn tạo nhánh fearture1 từ nhánh master, khi bạn đang đứng ở nhánh fearture1 và thay đổi code,
+	nếu bạn chưa commit thay đổi ở nhánh fearture1 mà chuyển sang nhánh master, git sẽ mang mọi thay đổi ở nhánh fearture1
+	sang nhánh master, đây là lý do tại sao code lại đc cập nhật ở cả hai nhánh, đây chỉ là một cơ chế bảo vệ của git và
+	giúp các developer dễ dàng trong việc quản lý và mang code đi mà không cần commit và merge.

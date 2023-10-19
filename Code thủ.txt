@@ -211,3 +211,78 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 	* equal() cũng tương tự như hashcode(), bạn phải override lại nếu muốn nó chạy đúng.
 	* khi mã hash giống nhau, java sẽ tìm trong ô nhớ có mã hash đó rồi dùng equal để kiểm tra xem mã có trùng các giá trị
 	trong object không, nếu true thì không tạo đối tượng mới, nếu false thì lưu vào ô nhớ có mã hash đó.
+
+* Bàn luận về I++ và ++I;
+	* I++: trong  một câu lệnh, prefix i++ sẽ được thực hiện sau tất cả các phép toán trong câu lệnh
+		* example:
+			int i = 1;
+			int a = 0;
+			a = 1 + i++; output: 2
+			sout(i); output: 2
+	* ++I: trong một câu lệnh, postfix ++i sẽ được thực hiện đầu tiên trước tất cả các phép toán trong câu lệnh.
+		* example:
+			int i=1;
+			int a = 0;
+			a = i + ++i; output: 3
+			sout(i); output: 2
+
+* Bàn luận về casting trong java.
+	* trong java có hai kiểu dữ liệu, nên cũng có hai kiểu casting, primitive casting và reference casting.
+		* Primitive Casting: ép kiểu dữ liệu nguyên thủy.
+			* Ép kiểu dữ liệu nguyên thủy có hai loại: Widening và Narrowing.
+			* Widening: là ép kiểu dữ liệu nhỏ sang kiểu dữ liệu lớn
+				* ví dụ: byte -> int, int -> long, int -> float, float -> double (lưu ý đây là kiểu số, String có khác một chút).
+				* với ép kiểu widening, chúng ta không cần khi tường minh kiểu cần ép, java sẽ tự ngầm hiểu, và ép kiểu widening
+				sẽ không làm thất thoát dữ liệu, bới vì ép sang dữ liệu lớn luôn luôn đủ bộ nhớ để lưu giá trị của kiểu dữ liệu nhỏ.
+			
+			* Narrowing: là ép kiểu dữ liệu lớn sang kiểu dữ liệu nhỏ.
+				* ví dụ: double -> int, int -> short.
+				* với ép kiểu narrowing, chúng ta viết viết tường minh kiểu cần ép sang, và ép kiểu widening có thể sẽ làm thất
+				thoát dữ liệu và làm sai lệch dữ liệu, vì kiểu dữ liệu nhỏ sẽ không đủ bộ nhớ lưu giá trị của kiểu dữ liệu lớn.
+	
+		* Refence Casting: ép kiểu dữ liệu tham chiếu.
+		* ép kiểu dữ liệu này ràng buộc bạn phải kiết kiểu dữ liệu tham chiếu là gì, và inheritance, polymophisim trong java.
+		nếu bạn hiểu, tôi sẽ trình bày cho bạn hiểu tường tận bản chất của reference casting trong java.
+		* ép kiểu reference có hai dạng: Up-Casting và Down-Casting.
+			* trước khi trình bày, tôi sẽ định nghĩa lại khái niệm reference casting cho riêng mình:
+				reference casting thực chất là chỉ định biến có kiểu dữ liệu này trỏ đến địa chỉ đối tượng thật lưu trong
+				heap có kiểu dữ liệu khác nhưng cùng quan hệ. tèn ten.
+			* Up-Casting: là ép kiểu từ class con sang class cha. ép kiểu này không cần code tường minh kiểu cần ép, java sẽ
+			tự ngầm hiểu.
+				* ví dụ:
+					Animal a = new Cat();
+					a -> là biến lưu trong stack, giá trị của a là địa chỉ đối tượng new Cat();
+					new Cat() -> là đối tượng thật lưu trong heap.
+					// vì Animal và Cat có quan hệ cha con, nên a hoàn toàn có để trỏ đến đối tượng cat.
+					// vì a có kiểu dữ liệu Animal, nên a chỉ biết các method của Animal, vì a trỏ đến đối tượng cat
+					// nên method của a gọi đến là method của cat, và a sẽ không thể gọi các method ngoài animal mà cat
+					// triển khai thêm. tất nhiên bởi vì biến a là kiểu Animal.
+				* Các bạn thấy quen không, khi chúng ta sử dụng java collection, chúng ta đang sử dụng up-casting.
+					* ví dụ:
+						List<Animal> animals = new ArrayList<>();
+						// ở đây List là một interface, nó của là một reference type.
+						// ArrayList là lớp triển khai interface List, tức là nó có quan hệ cha con.
+						// animal có kiểu List đang trỏ đến địa chỉ của một ArrayList thật trong heap
+						// nên khi gọi method của List là gọi đến method của đối tượng ArrayList thật.
+						Set<Integer> set = new Hashet<>() // cũng tương tự.
+			
+			* Down-Casting: là ép kiểu từ class cha sang class con. ép kiểu này cần code tường minh kiểu cần ép.
+				* khi các bạn đã hiểu những gì tôi nói ở trên, thì phần down-casting sẽ rất rễ để hiểu.
+				* ví dụ
+					 Animal a = new Cat();
+					 // như ví dụ ở trên, bạn chỉ sử dụng đc các method trong kiểu dữ liệu Animal
+					 // vấn đề đặt ra là bạn muốn sử dụng được thêm các phương thức khác của đối tượng thật Cat.
+					 // giải pháp là bạn cần ép a thành kiểu dữ liệu Cat.
+					 // Animal là lớp cha, Cat là lớp con, ép từ lớp cha sang lớp con thì gọi là down-casting.
+					 a = (Cat)a;
+					 // tất nhiên để ép được reference type, tất cả các class phải có mối quan hệ inheritance.
+					 // đến đây, biến a đã được thay đổi kiểu dữ liệu sang Cat và vẫn trỏ đến đối tượng cat thật trong heap
+					 // thế nên a đã có thể gọi đến các method riêng của Cat.
+					 a = (Dog)a;
+					 // nếu ép kiểu trên thì sao, chắc chắn java sẽ báo lỗi, vì class Dog và class Cat hoàn toàn là
+					 // hai kiểu dữ liệu khác nhau, không có mối quan hệ cha con, nên khi biến kiểu Dog mà trỏ đến đối tượng
+					 // thật kiểu Cat là hoàn toàn vô lý, động vật có thể là mèo, chứ chó không thể là mèo.
+					 Dog b = new Dog();
+					 b = (Aniaml)b; // câu này hoàn toàn đúng, Animal và Dog là inheritance.
+					 b = (Cat)b; // câu này hoàn toàn sai, Dog và Cat không là inheritance.
+				
