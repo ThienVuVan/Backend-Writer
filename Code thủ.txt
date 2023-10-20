@@ -225,6 +225,24 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 			int a = 0;
 			a = i + ++i; output: 3
 			sout(i); output: 2
+			
+* Bàn về hướng đối tượng.
+	* Java là một ngôn ngữ hướng đối hoàn toàn, mọi thứ khởi tạo đều nằm trong class.
+	* OOP có bốn tính chất sau: polymorphism, Inheritance, Enclapsulation, Abstraction.
+	* enclapsulation: tính đóng gói, tính đóng gói tức là mọi thuộc tính và phương thức của class đều được khai báo
+	và thuộc về class, đặc trưng cho tính đóng gói là access modifier, phạm vi truy cập của thuộc tính, mục đích là để tăng
+	độ bảo mật cho dữ liệu và chương trình.
+	
+	* inheritance: tính kế thừa, mục đích là để tối ưu code, rút gọn code, class con có thể kế thừa class cha để sử dụng lại
+	các thuộc tính chung, tránh lãng phí code.
+	
+	* Polymorphism: tính đa hình, một class có thể được biến thành nhiều class khác nhau tại cùng một thời điểm,
+	đặc trưng cho tính đa hình cần tính inheritance và hai phương thức quan trọng là overiding và overloading.
+	
+	* abstraction: tính trừu tượng, là cách tổ chức một class khi chỉ biết chức năng (method) của class, mà không quan tâm đến
+	method đó được triển khai như thế nào, chỉ biết nó là chức năng của class này hoặc của class implement nó. các phương thức
+	đó gọi là abstract method, làm nên abstraction là interface và abstract class, chúng ta đã tìm hiểu hai kiểu class này 
+	trong phần trước.
 
 * Bàn luận về casting trong java.
 	* trong java có hai kiểu dữ liệu, nên cũng có hai kiểu casting, primitive casting và reference casting.
@@ -285,4 +303,49 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 					 Dog b = new Dog();
 					 b = (Aniaml)b; // câu này hoàn toàn đúng, Animal và Dog là inheritance.
 					 b = (Cat)b; // câu này hoàn toàn sai, Dog và Cat không là inheritance.
-				
+
+* Bàn về String và StringBuilder và StringBuffer.
+	* Như đã biết, String là inmutable, nên việc thay đổi chuỗi, nối chuỗi là không thể, nhưng trong chương trình java, việc
+	cộng hai chuỗi "Hello" + "World" là công giá trị hai đối tượng vào một đối tượng mới và đưa vào stringpool, đồng thời java
+	sẽ lọc và xóa hai đối tượng cũ trong stringpool. Nói ngắn gọn là như vậy nhưng đằng sau việc cộng chuỗi có rất nhiều bước
+	thuật toán, điều này làm cho String chậm hơn nhiều StringBuiler và StringBuffer trong thao tác với dữ liệu.
+	* StringBuilder và StringBuffer được java thiết kế ra để giải quyết vấn đề hạn chế của String, StringBuilder và StringBuffer
+	là mutable, có thể thay đối được.
+	* Sự khác nhau giữa StringBuilder và StringBuffer là sự đồng bộ, StringBuilder không được đồng bộ và StringBuffer được đồng
+	bộ, nghĩa là trong một chương trình đa luồng, đối tượng StringBuffer sẽ được chia sẻ và được truy cập ở tất cả các luồng,
+	còn StringBuffer chỉ được truy cập và chia sẻ trong luồng của nó.
+	* StringBuilder có tốc độ nhanh hơn StringBuffer vì ít bước để sử lý dữ liệu hơn StringBuffer.
+
+* Bàn về Thread (Luồng) trong java.
+	* Multithread (đa luồng) trong java khi ngoài main thread của chường trình được jvm cung cấp, còn có nhiều luồng khác
+	chạy song song với chương trình và có thể sử dụng chung tài nguyên được chia sẻ.
+	* Các lỗi thường gặp với đa luồng:
+		* Race Condition: là khi một dữ liệu không được đồng bộ hóa, và bị nhiều luồng truy cập và thay đổi đồng thời cùng
+		một lúc, dẫn đến việc gia trị của dữ liệu bị thay đối không chính xác, để khắc phục điều này, nên sử dụng cơ chế 
+		đồng bộ hóa của java, đặc biệt là trong các giao dịch tài chính.
+		* Thread Deadlock: là khi nhiều luồng chờ đợi nhau để giải phóng lock, dẫn đến bị treo vô thời hạn.
+		* Starvation: là khi thread này bị chiếm tài nguyên sử dụng bởi thread khác nên luôn ở trạng thái waiting.
+
+* Bàn về ngôn ngữ Java.
+	* Java là một ngôn ngữ hướng đối tượng bậc cao, được phát triển bởi Sun, nhưng đã được Oracle mua lại.
+	* Java được mệnh danh là ngôn ngữ viết một lần chạy mọi nơi, đặc tính này có là nhờ vào JVM, một máy ảo sử dụng công
+	nghệ ảo hóa, chia sẻ chung tiến trình cpu với hệ điều hành chứ không yêu cầu bộ nhớ riêng, jvm có nhiệm vụ chuyển mã
+	bytecode sang mã máy phù hợp với OS, chính vì thế java có thể chạy trên mọi OS khác nhau.
+	* Java Flatform có 3 phiên bản: Java Micro Edition (Java ME), Java Standard Edition (Java SE), Java Enterprise Edition (Java EE)
+		* Java ME: dùng cho các thiết bị nhỏ như mobile..., hoặc hệ thống nhúng, bộ nhớ nhỏ yêu cầu các phiên bản có dung lượng nhỏ.
+		* Java SE: hay còn gọi là Java Core, bao gồm tất cả các thư viện cở bản và đầy đủ của java, jvm cũng được viết bằng java core.
+		* Java EE: được sử dụng để phát triển phát triển các ứng dụng web, có các thư viện như serverlet, javabeans...
+			* Java ee đã được một đội nhóm Oracle phát triển và đổi tên thành jakarta ee, còn java se và me vẫn giữ nguyên.
+			* khi tạo dự án spring, ta có thể thấy phiên bản sử dụng trong spring đều là jakarta ee.
+
+* Bàn về apache tomcat:
+	* apache tomcat là một phiên bản lightweight của apache, nó là một máy chủ web, hỗ trợ jsp/serverlet.
+	* vậy máy chủ web là gì:
+		* khi bạn chạy một chương trình Backend, ct đó chỉ chạy trên local, và chương trình đó sẽ không biết nhận tín hiệu
+		gọi đến kiểu gì, và nhận từ ai.
+		* và máy chủ web sẽ giải quyết vấn đề này, nó là một proxy, tức là đứng ra nhận request, gửi đến chường trình để sử
+		lý. Ví dụ khi deployment ứng dụng, ta có Nginx là một web server, là reverse proxy, đứng ra để bắt tất cả các request
+		gửi đến cổng được chỉ định bắt và gửi đến cổng mà ứng dụng đang chạy, và cũng hỗ trợ deploy frontend như như js, html ...
+		* trong spring framework, ta hay sử dụng apache tomcat làm máy chủ web, đứng ra nhận các request ở cổng chỉ định và
+		đưa vào ứng dụng, trong mô hình mvc, apache tomcat hỗ trợ build frontend như jsp, themleaf ..., và hỗ trợ serverlet.	
+		* cho nên không có máy chủ web ứng dụng vẫn chạy nhưng không có ai nói cho ứng dụng phải làm việc gì cả.
