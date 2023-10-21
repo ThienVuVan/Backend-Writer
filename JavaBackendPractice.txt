@@ -1,0 +1,755 @@
+* Java Backend Practice *
+
+* JDBC *
+	* JDBC (Java Database Connectivity) là một giao diện lập trình ứng dụng (API) trong Java cho phép các chương trình Java
+	kết nối với cơ sở dữ liệu.
+	* Nó cung cấp một cách tiêu chuẩn để truy cập và quản lý dữ liệu trong các hệ quản trị cơ sở dữ liệu (HĐCSDL) từ Java.
+	* Một trong những ưu điểm quan trọng của JDBC là nó giúp trừu tượng hóa việc truy cập cơ sở dữ liệu đối với các nhà cung cấp HĐCSDL khác nhau.
+	Tức là, cách truy cập cơ sở dữ liệu thông qua JDBC là giống nhau đối với tất cả các nhà cung cấp HĐCSDL,
+	bất kể họ sử dụng hệ quản trị cơ sở dữ liệu nào như Oracle, MySQL, SQL Server, và nhiều hệ thống khác.
+	Điều này cho phép chúng ta viết mã ứng dụng di động giữa các nhà cung cấp HĐCSDL khác nhau mà không cần thay đổi cú pháp
+	hay cách thức truy cập cơ sở dữ liệu.
+	* Khi chương trình Java gọi các phương thức JDBC để thực hiện các hoạt động như truy vấn dữ liệu, cập nhật dữ liệu,
+	thực hiện giao tác, JVM (Java Virtual Machine) sử dụng một JDBC driver tương ứng để dịch các cuộc gọi JDBC tổng quát
+	thành các cuộc gọi cụ thể cho nhà cung cấp HĐCSDL cụ thể. Mỗi nhà cung cấp HĐCSDL sẽ cung cấp một JDBC driver riêng để
+	đảm bảo tích hợp ổn định và tương thích giữa ứng dụng Java và hệ quản trị cơ sở dữ liệu của họ.
+	
+	* Có 4 loại jdbc drivers: JDBC-ODBC Bridge Driver, Native Driver, Network Protocol Driver, and Thin Driver. Thin Driver
+	được sử dụng phổ biến nhất. thin driver sẽ convert cuộc gọi trực tiếp tới database, nó có tốc độ nhanh và không cần phải
+	cài đặt phần mềm bên client và server. và điểm yếu là driver phụ thuộc vào database, nghĩa là khi muốn kết nối với database
+	nào thì cần đk riêng driver cho database vendor đó, dùng class.forname();
+	
+	* JDBC driver nó là một tập hợp các java class triển khai JDBD interfaces;
+	
+	* Để kết nói với db dùng jdbc, thì cần thực hiện 5 bước
+		* 1. Regist driver class.
+			Class.forName("com.mysql.jdbc.Driver"); 
+		* 2. Create connection.
+			* Phương thức getConnection() của lớp DriverManager được sử dụng để tạo connection với db.
+			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ebookshop? allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+        	"myuser", "xxxx"); 
+		* 3. Create statement.
+			* createStatement() của Connection được sử dụng để khởi tạo một statement. đối tượng statement có nhiệm vụ
+			thực hiện query với db.
+			* hữu ích khi sử dụng với query tĩnh, bởi bì statement không chấp nhận tham số.
+			stmt = conn.createStatement(); 
+		* 4. Excute query.
+			* executeQuery() của Statement được sử dụng để thực hiện query với db, nó sẽ trả về một ResultSet, là các bảng
+			các record.
+			ResultSet rs = stmt.executeQuery("SELECT * FROM EMP"); 
+			* cách lấy các giá trị
+			while(rs.next()){  
+				System.out.println(rs.getInt(1) + " " + rs.getString(2));  
+			} 
+		* 5. Close connection.
+			* close() của Connection sử dụng để đóng connection
+			statement.close();
+			con.close(); 
+			* note: từ java 7, có thể sử sụng try-with-resources để tự động đóng connection.
+
+	* DriverManager là class làm việc giữa user và driver, và có các phương thức để đk và tạo connection.
+	* Connection là một phiên làm việc giữa app và db.
+	* Mặc định, connection sẽ tự động commit sau khi thực hiện query sử dụng setAutoCommit(boolean status), mặc định là true,
+	để hiểu phần này, các bạn sẽ đc học transaction ở phần sau để hiểu commit là gì.
+	
+	* JDBC Statement
+		* Statement interface cung cấp các method để tạo và thực hiện các loại query.
+			ResultSet executeQuery(String SQL) : Returns a ResultSet object
+			int executeUpdate(String SQL) : Returns the numbers of rows affected
+			
+			Example 1: Execute a SELECT query via a Statement
+			// Create and execute an SQL statement that returns some data.
+			String SQL1 = "SELECT TOP 10 * FROM Person";
+			Statement stmt=conn.createStatement();
+			//ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE
+			ResultSet rs = stmt.executeQuery(SQL);
+			Example 2:	Execute an INSERT via a Statement
+			// Create and execute an SQL statement that returns some data.
+			String SQL2 = "INSERT INTO STOCK(STOCK_CODE, STOCK_NAME)
+						   VALUES('11', 'STOCK1')";
+			Statement stmt = conn.createStatement();
+			int no_of_row = stmt.executeUpdate(SQL);
+			
+			* Retrieve data
+			// Iterate through the data in the result set and display it.
+			while (rs.next()) {
+				System.out.println(rs.getInt(1) + "\t" + 
+						rs.getString(2)+"\t"+rs.getInt(3));
+			}
+			
+		* Thay vì phải đóng statement thù công, ta sử dụng try-with-resources để tự động đóng
+			try (Statement statement = connection.createStatement()) {
+				// use the statement in here.
+			} catch (SQLException e) {
+				  // TODO: handle exception
+			}
+		
+	* JDBC ResultSet
+		* là một interfaces đại diện có kết quả khi thực hiện query và có iterable.
+		* chứa các records, mỗi record chưa các column và có số lượng column giống nhau mặc dù mỗi column có thể ko có giá trị.
+		* Bạn có thể tạo một ResultSet bằng thực hiện Statement hoặc PreparedStatement.
+		
+	* JDBC PreparedStatement
+		* mà một interfaces extend từ Statement.
+		* được sử dụng để execute parameterized query.
+		* tăng tốc độ bới vì với PreparedStatement, query chỉ được compile một lần.
+		* dùng prepareStatement() method của Connection để tạo một đối tượng PreparedStatement.
+		String SQL = "Update Employees SET age = ? WHERE id = ?";
+		pstmt = conn.prepareStatement(SQL);
+		* các phương thức để set parameter cho query trong prepareStatement;
+			* public void setInt(int paramIndex, int value)
+			* public void setString(int paramIndex, String value)
+			* public void setFloat(int paramIndex, float value)
+			* public int executeUpdate(): Executes the query. It is used for create, drop, insert, update, delete etc.
+			* public ResultSet executeQuery(): Executes the select query. It returns an instance of ResultSet
+		* ví dụ set parameter:
+			pstmt.setInt(1,23); 
+			pstmt.setString(2,"Roshan"); 
+			pstmt.setString(3,"CEO"); 
+			pstmt.executeUpdate();
+		
+	* Jdbc Callablestatement
+		* được sử dụng để gọi stored procedures and functions. bạn nên học các khái niệm này trong sql.
+		* prepareCall() method của Connection được sử dụng để khởi tạo một Callablestatement.
+		CallableStatement stmt=con.prepareCall("{call myprocedure(?,?)}");
+		
+		
+	* Transaction Management in JDBC
+		* Transaction represents a single unit of work.
+		* Transaction là một đơn vị công việc. nằm trong Connection.
+		* đặc tính ACID nó mô tả tính chất của một transaction.
+			ACID stands for Atomicity, Consistency, isolation and durability.
+			Atomicity means either all successful or none.
+			Consistency ensures bringing the database from one consistent state to another consistent state.
+			Isolation ensures that transaction is isolated from other transaction.
+			Durability means once a transaction has been committed, it will remain so, even in the event of errors, power loss etc.
+		* void setAutoCommit(boolean status): set tự động commit.
+		* void commit()
+		* void rollback()
+		
+		* ví dụ: 
+			// using PreparedStatement
+			String query = “INSERT INTO Person “ + 
+						   “VALUES (?, ?)”
+			PreparedStatement statement = connect.prepareStatement(query);
+			connect.setAutoCommit(false);
+			statement.setString(1, “Titi”);
+			statement.setInt(2, 25);
+			statement.executeQuery();        // insert 1
+			statement.setString(1, “Tata”);
+			statement.setInt(2, 28);
+			statement.executeQuery();        // Insert 2
+			connect.commit();
+			connect.setAutoCommit(true);
+
+		* như đã biết, khi thực hiện query, khi transaction được commit thì dữ liệu mới được thay đổi trong db.
+		* các bạn sẽ được học về đối tượng transaction trong hibernate.
+		
+	* Batch Processing in JDBC
+		* một đối tượng statement chỉ thực hiện đươc một, không nó có thể thực hiện nhiều query cùng một lúc nhờ batch processing.
+		* để thêm một query vào statement ta sử dụng:
+			* void addBatch(String query)
+		* và khi thực hiện query, ta không sử sụng excuteQuery() ta sử dụng:
+			* int[] executeBatch(): It executes the batch of queries.
+		* ví dụ: 
+			Step 1:
+			connect.setAutoCommit(false);
+			Step 2: 
+			Statement statement = connect.createStatement();
+			statement.addBatch(<Insert query>);
+			statement.addBatch(<Insert query>);
+			statement.addBatch(<Update query>);
+			statement.addBatch(<Delete query>);
+			Step 3:
+			int[] updateCounts = statement.executeBatch();
+			connect.commit();
+			statement.close();
+			connect.setAutoCommit(true);
+		* tại sao phải setAutoCommit(false), tại vì nếu ko set, Connection sẽ tự động commit.
+
+* Summary
+	Java JDBC Tutorial
+	Working steps
+	DriverManager class
+	JDBC Statement
+	JDBC ResultSet
+	JDBC PreparedStatement (with Parameter)
+	Jdbc Callablestatement 
+	Transaction Management in JDBC
+	Batch Processing in JDBC
+	<------------------ Đó là tất cả những gì bạn cần biết về JDBC trong Java --------------------------------------------->
+
+
+<------------------------------------- Hibernate Introduce ----------------------------------------->
+
+* Trước tiên cần biết ORM là gì
+	* Object Relation Mapping là một tư tưởng để chuyển dữ liệu từ relation db sang oop language.
+	* JPA( java persistence api) là thư viện tiêu chuẩn hóa tư tưởng ORM, chứa các anotation và interfaces.
+	* Hibernate là ORM FrameWork triển khai JPA. dùng để kết nối với db
+	* Các fearture của hibernate:
+		* Light-weight
+		* Open-Source
+		* Hight perfromace
+		* Database Independent: no need to write sql, support many vendor.
+		* Auto - Generation: auto gen table
+		* ORM
+		* Caching: first level and second level
+		* Lazy Loading: load need dât
+		* Scalability
+		* HQL: interct with class, not table.
+	* nói đi nói lại, thì Hibernate vẫn kết nối với db thông qua jdbc.
+	* nếu chia tổng quan module, hibernate gồm config file và mapping file,
+		* config file là nơi chứa các driver, connect url, username, passowrd, auto-gen table ..
+	
+	* Các core component của hibernate.
+		* SessionFactory: là nơi chứa các component con phục vụ cho việc kết nối với db.
+			SessionFactory sessionFactory = cfg.buildSessionFactory(); // cfg là file config, dạng xml
+			
+			* openSession(): method always opens a new session. // sesstion giống hệt Connection trong JDBC.
+			* getCurrentSession(): method returns the session bound to the context. fater than open a new session. but need config in xml.
+			* openStatelessSession(): method returns instance of StatelessSession
+				StatelessSession in Hibernate does not implement first-level cache and it doesn’t interact with any second-level.
+				nó giống hệt Connection của JDBC vì ko đc thừa hưởng benifit gì của hibernate.
+		* Session 
+			* cung cấp giao diện giữa app và db, dùng để kết nối với db.
+			* các đối tượng pesistence được lưu và truy xuất thông qua session, chúng ta sẽ học về trạng thái của đối tượng sau.
+			* cần được đóng khi ko dùng nữa, vì nó là unsafe thread.
+			* là factory của Transaction, Query và Criteria.
+			* nó có firt-level cache là default.
+			* mở một session:
+				Session session = sessionFactory.openSession();
+		* Transaction
+			* Tạo ra từ session, trong jdbc sử dụng transaction thông qua connection, thì ở đây ta có một đối tượng
+			transaction riêng.
+			
+			* Cách khởi tạo:
+				Transaction transaction = session.beginTransaction();     
+				Serializable result = session.save(job);      
+				transaction.commit();
+	* Configuration
+		* làm sao để class có thể liên quan đến table?
+		* ta cần sử dụng config của hibernate.
+		* giống như trong ứng dụng java có file properties, là file config của ứng dụng.
+		* khuyến nghị sử dụng file config của hibernate là xml và tên file là cfg.xml
+		* ví dụ:
+			<?xml version='1.0' encoding='utf-8'?>
+			<!DOCTYPE 	hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN“
+					"http:// sourceforge.net/hibernate-configuration-3.0.dtd">
+			<hibernate-configuration>
+			<session-factory>
+			<!-- Database connection settings -->
+			<property name="connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+			<property name="connection.url">jdbc:sqlserver://localhost:1433;databaseName=hrms</property>
+			<property name="connection.username">sa</property>
+			<property name="connection.password">12345678</property>
+
+			<!-- JDBC connection pool (use the built-in) -->
+			<property name="connection.pool_size">1</property>
+
+			<!-- SQL dialect -->
+			<property name="dialect">org. dialect.SQLServerDialect</property>
+
+			<!-- Echo all executed SQL to stdout -->
+			<property name="show_sql">true</property>
+
+			<!-- Drop and re-create the database schema on startup -->
+			<property name="hbm2ddl.auto">update</property>
+			</session-factory>
+			</hibernate-configuration>
+	
+	* Hibernate First Example
+		* các bước để tạo một ứng dụng java sử dụng hibernate
+			* Create the Java maven Project // sử dụng maven để quản lý thư viện
+			* Add all required dependencies for hibernate // add dependencies vào file pom.xml để tự động load viện
+			* Create the Persistent class // tạo class
+			* Create the mapping file for Persistent class // thêm các anotation để đánh dấu map với table
+			* Create the Configuration file // tạo file hibernate.cfg/xml trong resources.
+			* Create the class that retrieves or stores the persistent object // tạo các class để mở session, và hứng data
+			* Run the application // chạy thôi.
+	* Summary
+	Hibernate Overview
+	Hibernate Features 
+	Hibernate Architecture
+	Configuration
+	Hibernate First Example
+	
+	< --------------------------------- Hết rồi, nhớ ôn lại --------------------------->
+	
+< ------------------------------------ Hibernate Mapping ------------------------------------------------>
+	* Basic Annotations
+		* là các anotation trong JPA, quy định việc mapping giữa class và table.
+	
+	* Hibernate relationships
+		* hiểu được Bi-directional và Uni-directional.
+		* các anotation tự học, vì dài
+	* Lazy loading and Eager loading
+		* hiểu đơn giản
+		* Lazy Loading: chỉ lấy data được chỉ định, chứ không lấy data có mối quan hệ với nó.
+		* Eager loading: lấy data được chỉ định, đồng thời load luôn data có quan hệ.
+< ----------------------------------- Hết -------------------------------------------->
+
+
+<--------------------------------- Hibernate Query ------------------------------------->
+	* trong bài này, cũng có vẻ dài nhưng nhớ được, chỉ có một đối tượng mới trong session là Query,
+	đối tượng Query giống như statement của jdbc, để tực hiện một query, và có các phương thức để thực hiện và trả về
+	
+	* java cũng có ngôn ngữ truy vấn riêng là Java Persistence Query Language (JPQL), được phát triển từ HQL, là con của HQL
+	nên một truy vấn JPQL luôn là một HQL hợp lệ, nhưng một truy vấn HQL chưa chắc là một truy vấn JPQL hợp lệ.
+	
+	* và trong spring data jpa, sử dụng JPQL. học sau.
+	
+	* hibernate cho phép sử dụng native query thông qua Session.createNativeQuery() method.
+	* tạo một đối tượng query sử sử dụng native query
+		Query<Employees> query = session.createNativeQuery(String query);
+	* để thực hiện query, dùng phương thức list();
+		* List<Object> list() method: returns the list of Object array
+		* addEntity() and addJoin() methods to fetch the data from associated table using tables join
+		* ví dụ: 
+			Query<Jobs> query = session
+				.createNativeQuery("SELECT * FROM dbo.Jobs")
+				.addEntity(Jobs.class);
+            
+            return query.list();
+			// có thể thấy, phải chỉ định class trả về thông qua addEntity(), khá phức tạp, và nếu ,muốn join phải dùng addJoin().
+			Query query = session.createNativeQuery(
+                    "SELECT j.*, e.* FROM dbo.Jobs j JOIN dbo.Employees e "
+                    + "ON j.job_id = e.job_id")
+                    	.addEntity("j", Jobs.class)
+					.addJoin("e", "j.employees");
+            
+            List<Object[]> jobs = query.list();
+		* có thể sử dụng parameter với đối tượng query và cho native query như sau
+			Query query = session.createNativeQuery(
+                    "SELECT * FROM dbo.Jobs j WHERE j.job_title LIKE :title "
+                    + "AND j.min_salary <= :salary AND j.max_salary >= :salary")
+                    .addEntity(Jobs.class);
+            
+            query.setParameter("title", "%" + title + "%");
+            query.setParameter("salary", salary);
+            
+            return query.list();
+			
+		* @NamedNativeQuery dùng để định nghĩa trước một query và gán nó vào một name.
+		* NamedNativeQueries chứa các NamedNativeQuery
+			* ví dụ:
+			Query<Employees> query = session
+                    .createNamedQuery("FIND_EMP_BY_JOB"); // FIND_EMP_BY_JOB tên của query đó.
+            
+            query.setParameter("jobTitle", "%" + jobTile + "%");
+            return query.list();
+		
+		* query.getSingleResult()
+			* nếu bạn biết sql chỉ trả về một kết quả là số, thì sử dụng getSingleResult
+			* ví dụ: 
+				Query query = session.createNamedQuery("COUNT_EMP");
+				query.setParameter("jobId", jobId);
+				
+				return (double) query.getSingleResult();
+	
+	* Hibernate Query Language
+		* syntax giống với sql
+		* sử dụng tên của bảng thay vì tên table, tên thuộc tính thay vì tên cột.
+		* không phân biệt chữ hoa chữ thường với syntax
+		* nhưng phân biệt chữ hoa và thường cho tên class và bảng.
+		
+		* ví dụ:
+			String hql = "FROM Projects WHERE startDate >= :startDate";
+			Query query = session.createQuery(hql);
+			query.setParameter("startDate", startDate);
+			List listResult = query.list(); // for select
+			int rowsAffected = query.executeUpdate(); for insert, update, delete.
+			
+			// pageing
+			Query query = session.createQuery("FROM Employees");
+			query.setFirstResult(0);
+			query.setMaxResults(10);
+			return query.list();
+			
+			// thay vì sử dụng getSingleReulse của statement jdbc, ta dùng get(0);
+			String hql = "SELECT COUNT(jobTitle) FROM Jobs";	
+			Query query = session.createQuery(hql);
+			List listResult = query.list();
+			Number number = (Number) listResult.get(0);
+			System.out.println(number.intValue());
+			
+	* @NameQueries: is used to define the multiple named queries.
+
+	* @NameQuery: is used to define the single named query.
+	// namequery của hibernate cũng tương tự namequery trong native sql, chỉ khác anotation
+	
+	* get() and load() là hai hàm thuộc về session, dùng để lấy data thông qua khóa chính, ko cần thực hiến query.
+		* ví dụ:
+			// Get Example
+			User user = (User) session.get(User.class, new Integer(2));
+
+			// Load Example
+			User user = (User) session.load(User.class, new Integer(2));
+		* get() method return null: If no row is available in the session cache or the database for the given identifier
+			eager load the object, slower than load() because it return fully initialized , use when If you are not sure
+			that object exist then use get() method 
+
+		* load() method throws object not found exception, lazy load the object, slightly faster, use when If you are sure
+			that object exist then use load() method 
+	
+	* Summary
+		Queries Introduction
+		 Native Query
+		 Hibernate Query Language
+		 Hibernate Named Query
+		 Proxy Object
+		 get() vs load() method
+	
+	< --------------------------- Hết ------------------------------->
+	
+< ------------------------ Hibetnate Object States/Lifecycle ----------------------------->
+* bỏ qua hibernate criteria.
+
+* có ba trạng thái của một object khi làm việc với ứng dụng java: Transient, Persistent và Detach.
+	* Khi bạn khởi tạo một đối tượng, thì đối tượng đó đang ở trạng thái Transient, đơn giản thế thôi, ở trạng thái này,
+		object không hề liên quan đến session, vậy nên Transient state không liên quan đến db. Transient object tồn tại
+		trong heap, độc lập với hibernate.
+		* ví dụ:
+			Employee e=new Employee(); 
+			e.setId(101);  
+			e.setFirstName("Gaurav");  
+			e.setLastName("Chawla");
+
+	* Khi mà object được kết nối với session, thì nó được đưa vào trạng thái Persistent, object sẽ chuyển sang Persistent state
+		khi chúng ta save() hoặc persist() object. mỗi object đại diện cho một row trong db.
+		* ví dụ:
+			session.save(e);  
+			session.persist(e);  
+			session.update(e);  
+			session.saveOrUpdate(e);  
+			session.lock(e);  
+			session.merge(e); 
+			
+	* Khi chúng ta đóng session hoặc xóa bộ nhớ cache của session, object sẽ chuyển sang trạng thái detach, nghĩa là object
+		không còn kết nối với session nữa, muốn đưa object trở lại trạng thái Persistent, thì ta cần đưa object đó vào một
+		session mới, gọi là reattach bằng dùng các method sau của session: lock(), merge(), refresh(), update() or save()
+		* ví dụ đưa object sang trạng thái detach:
+			session.close();  
+			session.clear();  
+			session.detach(e);  
+			session.evict(e);
+* Các Hàm phổ biến để làm việc với object của session: persist(), save(), merge(), update(), saveOrUpdate().
+	* persist()
+		* dùng để thêm một object transient vào persistent context
+		* câu lệnh insert chỉ sinh ra khi gọi transaction.commit() hoặc session.close()
+		* nếu object ở trạng thái persistent thì sẽ ko có gì thay đổi với đt đó trong context.
+		* nếu truyền vào là detach object, thì sẽ ném ra lỗi khi gọi method này hoặc khi commit hoặc flush.
+		* Bản đặc tả không nói đến id của đối tượng sẽ được sinh ra ngay lúc gọi hàm persist() ,
+			dù cho ta chọn cách sinh ID như nào đi nữa. Bản đặc tả cũng cho phép các implementation của hàm persist()
+			sinh ra câu lệnh SQL để generate ID cho đối tượng vào lúc commit hoặc flush session, và thế nghĩa là ID 
+			của đối tượng không hề được đảm bảo sẽ được sinh ra sau khi gọi hàm này, cho nên ta có thể gặp NULL nếu get
+			cái ID ra sau khi gọi persist().
+		* ví dụ:
+			Person person = new Person();
+			person.setName("John");
+			session.persist(person);
+
+	* save()
+		* Hàm này là hàm gốc của hibernate, nó không tuân thủ đặc tả của JPA cho lắm.
+		* tức là với một số kiểu dữ liệu, hàm này không cần commit transaction, nó tự động commit, điều này
+			dẫn đến một số lỗi ko đáng có và kho kiểm soát object.
+		* nên tốt nhất hãy dùng persist().
+		* khi save() một detach object, nó sẽ tạo ra một đối tượng mới trong context mới một id mới, điều này là không
+			mong muốn bởi vì sẽ làm duplicate row trong db khi commit hoặc flush. đó, điều này là bất lợi thứ hai.
+		* ví dụ:
+			Person person = new Person();
+			person.setName("John");
+			Long id = (Long) session.save(person);
+			
+	* merge()
+		* Mục đích chính của hàm merge là để cập nhật giá trị cho persistent object trong context từ detach object.
+		* khi truyền vào là một detach object, nó sẽ copy các giá trị bên trong và gán vào persistent object.
+		* khi truyền vào là một transient object, nó sẽ tạo ra một persistent object mới trong context.
+		* nếu truyền vào là persistent, thì sẽ ko có tác động gì.
+		* ví dụ:
+			Person person = new Person(); 
+			person.setName("John"); 
+			session.save(person);
+
+			session.evict(person);
+			person.setName("Mary");
+
+			Person mergedPerson = (Person) session.merge(person);
+			
+	* update()
+		* giống như save(), là một hàm gốc của hibernate.
+		* mục đích chính là để đưa một detach object lại thành một persistent object. nó cũng copy giá trị như merge.
+		* nhưng khi truyền vào một transient, nó sẽ ném ra lỗi ngay. bất tiện đko.
+		* ví dụ:
+			Person person = new Person();
+			person.setName("John");
+			session.save(person);
+			session.evict(person);
+			 
+			person.setName("Mary");
+			session.update(person);
+
+	* saveOrUpdate()
+		* method này chỉ xuất hiện trong hibernate API, và nó như là phiên bản cải tiến của update()
+		* nó khác update duy nhất là khi truyển một transient, nó tạo một persistent object mới chứ ko ném ra lỗi
+			hay đúng không.
+		* ví dụ:
+			Person person = new Person();
+			person.setName("John");
+			session.saveOrUpdate(person);
+
+	* Tóm lại, khi làm việc với hibernate, bạn chỉ nên dùng persist, merge và saveOrUpdate.
+
+< -------------------------------- Hết --------------------------------------->
+
+< -------------------------------- Hibernate Validator - Java Bean Validation ---------------------------------->
+	Validation annotations
+	Validating Ranges
+	Validating Strings
+	URL and HTML Validation
+	Hibernate validation @Pattern
+	
+	* Hibernate Validator hay còn gọi là java bean validation, vì hibernate là một java framework, nên Hibernate Validator
+	như là một java bean validation.
+	* JSR 380 (Java Specification Request) là đặc tả cho java bean validation. là một phần của jakarta ee và java se.
+	* cần thêm thư viện để sử dụng.
+	
+	* để hiểu về các anotaion, đọc slide, vì dài.
+	* phần này không có gì phức tạp cần giải thích, tự đọc slide.
+ -------------------------- Hết --------------------------------
+ 
+ -------------------------- Hibernate Caching ---------------------
+ * phần này khá quan trọng, cần nắm bắt tốt để biết luồng chạy của data.
+ 
+ * Caching in Hibernate
+	* hibernate cache giúp tăng hiệu xuất chương trình, giảm số lượng query.
+	* hibernate cung cấp 3 loại cache của một session:
+		First Level Cache
+		Second Level Cache
+		Query Cache
+	
+	* First Level Cache
+		* First Level Cache được kết nối với session, được bật default và không có cách nào để tắt đi cả.
+		* tất cả các object trong cache của session sẽ không được nhìn thấy bởi session khác, và khi đóng session,
+		tất cả object trong cache cũng mất.
+		
+		* hibernate cung cấp một số method để chúng ta có thể làm việc với các object trong first level cache.
+			evict() remove a single object from the hibernate first level cache.
+			clear() clear the cache: delete all the objects from the cache.
+			contains() check if an object is present in the hibernate cache or not.
+			* xem ví dụ trong slide.
+	
+	* Hibernate First Level Cache được kết hợp với đối tượng Session (phiên làm việc).
+	First Level Cache được mặc định sử dụng trong Hibernate và bạn chẳng cần phải làm gì để bật nó lên cũng như không
+	có cách nào để tắt nó đi cả. Tuy nhiên, Hibernate cung cấp các phuơng thức mà thông qua nó, chúng ta có thể xóa bỏ
+	các đối tượng được lựa chọn từ bộ nhớ cache hay giải phóng bộ nhớ cache 1 cách hoàn toàn. Bất cứ đối tượng đuợc cách
+	nào trong 1 session (phiên làm việc) sẽ không bị ảnh hưởng bởi các session khác và khi session đó bị đóng lại, tất cả
+	các đối tượng được cache đó cũng sẽ bị mất.
+
+CÁC ĐẶC ĐIỂM QUAN TRỌNG CẦN CHÚ Ý
+* First Level Cache được kết hợp với đối tượng "session" và các đối tượng session khác trong ứng dụng không thể
+ "nhìn thấy" hay làm ảnh hưởng
+* Phạm vi của cách đối tượng cache này là session (phiên). Khi một session bị đóng lại, các đối tượng cache thuộc
+ session đó sẽ vĩnh viễn bị mất đi.
+* First Level Cache là mặc định trong Hibernate và không có cách nào để disable nó cả.
+* Khi chúng ta truy vấn 1 thực thể (abc) lần đầu tiên, nó sẽ được lấy về từ database và được lữu trữ trong bộ nhớ
+ của first-level cache - cái mà được liên kết với đối tượng hibernate session
+* Nếu chúng ta truy vấn lại cùng 1 đối tượng (abc) với cùng session, nó sẽ được load từ trong cache thay vì việc thực
+ thi lại câu truy vấn sql
+* Thực thể (abc) được load có thể bị xóa khỏi session, khỏi bộ nhớ first level cache bằng việc sử dụng phuơng thức
+ evict(entity). Như vậy, vào lần tiếp theo ta truy vấn thực thể đó, nó sẽ được lấy từ database (thay vì bộ nhớ cache).
+* Toàn bộ bộ nhớ cache của session có thể bị làm trống với việc sử dụng phuơng thức clear(). Điều này có nghĩa là các
+ thực thể được lưu trữ trong bộ nhớ cache cũng sẽ bị xóa bỏ.
+ 
+
+	* Second Level Cache
+		* second level cache giống như first level cache, chỉ khác một số điều sau
+			* second level cache không được tự động bật cho các object, phải cấu hình để cho phép các object đc lưu trong 
+			second level cache.
+			* slc không có sẵn trong hibernate, hibernate sử dụng các provider bên ngoài dùng làm slc, như EHCache.
+			* cần thêm dependencies vào pom, và config trong file config của hibernate, và config trong mỗi class.
+			* khi đối tượng được config, khi truy xuất đối tượng ra, object sẽ đc lưu trong flc, và đồng thời cũng đc lưu
+			trong slc.
+			* khi đóng session, đối tượng vẫn tồn tại trong slc mặc dù flc đã mất.
+			* lý do bởi vì flc là session scope, còn slc là sessionFactory scope, nghĩa là chia sẻ cache cho mọi session, và
+			chỉ có một slc trong chương trình.
+			* và khi truy xuất đối tượng đó, nó sẽ tìm trong flc, nếu không có nó sẽ tìm trong slc, nếu không có nữa thì
+			mới thực hiện query. rất đặc biệt phải không.
+		* Tham khảo code trong slide nhé.
+	
+	* Query cache: phần này tham khảo trong slide, vì không quan trọng lắm.
+
+--------------------------------- SPRING FRAMEWORK - Introducetion ----------------------------- 
+
+* Spring Ioc (Inversion of Control)
+	* đảo ngược sự kiểm soát, tức là với code thông thường, các bạn phải khởi tạo một đối tượng để dùng, nhưng với cơ chế IOC,
+	bạn chỉ cần cấu hình, mọi thứ còn lại để spring lo.
+	* với IOC, spring sẽ đọc file cấu hình vào tự động khởi tạo các đối tượng trong ApplicationContext, muốn dùng
+	một đối tượng, bạn chỉ cần lấy đối tượng ApplicationContext thông qua API ClassPathXmlApplicationContext(). và từ context
+	lấy ra bean đã đc khởi tạo để sử dụng.
+	* các bước để thực hiện IOC:
+		Load jar files // đây là load thư viện cần thiết // xem slide
+		Bean Class // tạo class bình thường, bean class là class để tạo ra bean.
+		XML file // file cấu hình để spring đọc để khởi tạo bean.
+		Demo Class // demo truy suất
+		Run
+	* ví dụ về demo class:
+		ApplicationContext context = new ClassPathXmlApplicationContext("employeeBean.xml");
+		// employeeBean.xml là file config.
+		Employee emp1 = (Employee) context.getBean("emp1");
+		Employee emp2= (Employee) context.getBean("emp2");
+
+		System.out.println("Employee details: " + emp1);
+		System.out.println("Employee details: " + emp2);
+	* trong spring, có hai kiểu container hay là context.
+		* BeanFactory: là container đơn giản nhất có hỗ trợ dependency Ịnection
+		* ApplicationContext: xây dựng dựa trên BeanFactory, hỗ trợ nhiều tính năng hơn. (recommend).
+	* các đối tượng được khởi tạo trong context được gọi là bean, bạn đã hiểu chưa.
+	
+* Spring bean
+	* Beans are the objects that form the backbone of our application and are managed by the Spring IoC container.
+	* Spring IoC container instantiates, assembles, and manages the bean object.
+	* The configuration metadata that are supplied to the container are used create Beans object.
+	// ba khái niệm về bean.
+	
+	* Bean có khá nhiều thuộc tính quan trọng, nhưng chúng ta nhắc đến vài cái thiets yếu nhất:
+		* Lazy - initailize: nói cho spring IOC biết rằng chỉ khởi tạo một đối tượng khi nó được yêu cầu lấy ra dùng,
+			chứ không phải khởi tạo khi chạy chương trình, để tiết kiệm bộ nhớ.
+		* Scope
+			* singleton: là chỉ một bean của một class đó được tạo trong context, nhiều lần truy xuất bean đó, thì chỉ có
+			một bean trong context được trả ra, tức là nhiều biến trỏ đến một bean, chứ không phải mỗi lần truy xuất làm
+			tạo ra một bean mới.
+			* prototype: mỗi lần truy xuất đều tạo ra một bean mới, nên mỗi biến trỏ bến một bean khác nhau. tùy vào mục
+			đích sử dụng mà chúng ta chọn scope thích hợp.
+
+* Spring DI (tiêm phụ thuộc)
+	* nó được thiết kế để giúp quản lý chương trình tốt hơn, và giúp mối liên hệ trong chương trình lỏng lẻo hơn(Loosely couple)
+	giúp các thành phần ít liên quan đến nhau, ít xảy ra lỗi hơn.
+	* trong chương này, chúng ta mới chỉ học tiêm phụ thuộc bằng trong file config xml, cta sẽ học tiêm bằng anotation,
+	và config tạo bean bằng anotation sau.
+	* DI cung cấp hai cách để tiêm phụ thuộc
+		* Constructer.
+		* Setter.
+
+------------------------------- Spring MVC -------------------------------------
+* Mô hình mvc là một kiến trúc phần mềm sử dụng để tổ chức ứng dụng thành 3 phần chính
+	* Model: đại diện cho dữ liệu và logic để sử lý dữ liệu. phần quản lý và truy suất dữ liệu.
+	* View: đại diện cho giao diện người dùng, view hiển thị thông tin từ model và thu thập thông tin.
+	* Controller: là cầu nối giữa model và view, nơi nhận yêu cầu thông qua view, xử lý nó bằng cách tương tác với model.
+		sau đó cập nhật view với dữ liệu mới.
+* Nói luôn về mô hình 3 lớp: cũng là một kiến trúc để phát triển ứng dụng để dễ dang quản lý, phân thành 3 tầng
+	Controller, Service, DataAccess.
+	* Controller: đại diện cho lớp điều khiển trong mô hình mvc, và làm việc với lớp service để thực hiện logic kinh doanh
+	* Service layer: chứa logic của ứng dụng, nó thực hiện các chức năng cụ thể của ứng dụng, gửi và truy cập lớp dataaccess
+		cung cấp các dịch vụ cho controller.
+	* DataAccess layer: lớp này có nhiệm vụ tương tác với database hoặc bất kì nguồn dữ liệu nào khác, chịu trách nhiệm truyền
+		dứ liệu cho service layer, thường sử dụng jdbc, hibernate, spring data jpa để kết nối với db.
+	* mô hình 3 lớp giúp tách biệt ứng dụng thành các cấu trúc rõ ràng, dễ bảo trì, mở rộng và kiểm thử.
+
+* spring web mvc là một phần của spring framework dùng để tạo web application, hỗ trợ IOC, DI, sử dụng Dispatcheservlet để
+bắt request. default handler dựa trên @Controller và @RequestMapping anotation.
+
+* Trong mô mình web mvc sử dụng jsp/servlet cũ, thì servlet như là controller, jsp là view, model là các java bean, và servlet
+sẽ đứng ra nhận request.
+* Trong mô hình spring web mvc, cấu trúc có khác đi, có thể sử dụng nhiều công nghệ, @Controller và @RequestMapping đánh
+dấu class đại diện cho phần controller, View có thể sử dụng jsp, themleaf..., model có thể chia làm nhiều layer. về phần
+cấu trúc thì xem trong  slide.
+
+* làm thế nào để xây ứng dụng mvc với xml.
+	* Bàn cần cấu hình hai file: web.xml và spring-servlet.xml
+		* web.xml là cấu hình dispatcherservlet, xem cấu trúc sẽ hiểu.
+		* spring-servlet.xml là cấu hình các bean cần thiết, scan cac anotaion để khởi tạo bean.
+	
+	* Tạo class controller: cấu hình class với anotaion @Controller: đơn giản để spring ioc quét và hiểu đây là controller,
+		và các api đánh dấu với @RequestMapping và url để Dispatcheservlet biết nơi request cần đến.
+	
+	* Cấu hình ViewResoler trong spring-web.xml để spring biết lối tìm view.
+	
+	* để biết chi tiết nhất, hãy thực hành.
+	
+* Spring @Autowired
+	* Như ở bài trước ta đã học dependency injection nhưng bằng xml, khá là bất tiện, trong phần này, ta học injection
+	bằng anotaion @Autowired, thuận tiện hơn rất nhiều.
+	* spring có cơ chế spring bean auto wiring, một lưu ý đặc biệt, @Autowired chỉ có thể dùng trong bean, nghĩa là bean
+	auto wire vào bean, chứ không để auto wire class ko phải là bean, trong phần xml chúng ta cũng đã hiểu rõ điều này.
+	* ví dụ: xem slide vì ko copy đc.
+	* như bạn thấy, @component đánh dấu class này sẽ đc tạo thành bean khi app chạy, bạn sẽ đc học sâu hơn về component ở
+	phần sau, và hãy đảm bảo rằng bạn cấu hình đúng để spring có thể quét được lớp này.
+	* như bạn đã thấy đoạn code sau:
+		@Configuration
+		@ComponentScan(basePackages = { "fa.training.controller" })
+		public class WebMvcConfig {}
+		// ta có thể cấu hình bằng class thay vì xml, bạn có thể học rõ hơn về bài sau.
+	* trong ví dụ bạn xem, bạn thấy @Autowired đặt ở field, nghĩa là field injejection, điều này chương trình vẫn chạy đúng
+	nhưng tôi không khuyến khích field injection, vì nó có thể gây ra vài lỗi nullpointerexception khi bean không khởi tạo đc.
+	hãy dùng contructor injection.
+	
+	* các bược cơ bản tạo web mvc
+	The steps are as follows:
+	Create the request /respone pages
+	Create the bean/controller/service/dao class
+	Provide the entry of controller in the web.xml file
+	Define the bean in the xml file
+	Start server and deploy the project
+	// hãy xem code mẫu trong slide để hiểu rõ hơn.
+
+
+
+
+	
+
+ 
+
+
+	
+		
+
+	
+
+			
+
+		
+	*
+
+* 
+
+
+
+
+
+
+
+
+			
+
+
+            
+
+           
+
+
+
+	
+	
+
+
+		
+
+
+
+
+
+
+
+
+		
+
+
+
+		
+	
+		
+	
+
+
+
+	

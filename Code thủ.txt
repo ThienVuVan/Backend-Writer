@@ -349,3 +349,19 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 		* trong spring framework, ta hay sử dụng apache tomcat làm máy chủ web, đứng ra nhận các request ở cổng chỉ định và
 		đưa vào ứng dụng, trong mô hình mvc, apache tomcat hỗ trợ build frontend như jsp, themleaf ..., và hỗ trợ serverlet.	
 		* cho nên không có máy chủ web ứng dụng vẫn chạy nhưng không có ai nói cho ứng dụng phải làm việc gì cả.
+
+* Bàn về access modifier trong java.
+	* Trong java có nhiều loại access modifier: public, private, protected, default, static, abstract ...
+	* Bàn về bốn loại chính hay dùng với biến trong class: public, private, protected, default.
+	* Public: biến hay phương thức public có thể được truy cập qua đối tượng được khởi tạo mọi nơi trong chương trình,
+		public được áp dụng khi khai báo class.
+	* Default: biến hoặc phương thức default được truy cập trong class và từ các đối tượng được khởi tạo trong cùng package,
+	nếu đối tượng được khởi tạo không cùng package của class sẽ không truy cập đc các default properties và method. và các
+	class con không thể truy cập được biến và phương thức của lớp cha nếu khai báo trong package khác. 
+	* Protected: biến và phương thức khai báo với protected được truy cập trong class, được truy cập trong class con khai báo
+	ngoài hoặc bên package, được truy cập với đối tượng khởi tạo trong cùng package, nhưng không truy cập được đối với đối tượng khởi tạo ngoài package.
+	* Private: các biến và đối tượng private chỉ được truy cập trong lớp, không được truy cập ở bất cứ đâu nữa.
+	* class chỉ có access modifier là public, abstract;
+	* properties và methods có các access modifier là public, private, protected, default, static, abstract;
+	* Constructor có các access modifier là public, private, protected, default;
+	
