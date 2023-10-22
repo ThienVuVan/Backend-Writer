@@ -501,6 +501,7 @@
 
 < -------------------------------- Hết --------------------------------------->
 
+
 < -------------------------------- Hibernate Validator - Java Bean Validation ---------------------------------->
 	Validation annotations
 	Validating Ranges
@@ -577,8 +578,100 @@ CÁC ĐẶC ĐIỂM QUAN TRỌNG CẦN CHÚ Ý
 		* Tham khảo code trong slide nhé.
 	
 	* Query cache: phần này tham khảo trong slide, vì không quan trọng lắm.
+	
+< ------------------------------------ Entity Manager ------------------------------------->
+
+* Trong JPA, nó cũng có Module để làm việc với db, và nó gần như tương sự với sessionFatory
+	đó là EntityManagerFactory.
+	* để khởi tạo sessionFactory, ta cần file config của hibernate.
+	* để khoi tạo  EntityManagerFactory ta cũng cần file config có tên Pesistence.xml;
+	* nhưng trong spring boot, spring sẽ tự động load và khởi tạo EntityManager là bean trong context, nên chỉ cần lấy
+	ra dùng bằng anotation @Autowired hoặc @PersistenceContext.
+	* thường thì nếu gặp một query khó mà spring data jpa không làm được, thì ta dùng entity manager.
+
+Transient, Persistent, và Detached State:
+
+* Trong JPA, cũng có ba trạng thái chính của đối tượng: Transient, Persistent và Detached.
+	Trạng thái Transient: Đối tượng ở trạng thái này không liên quan đến EntityManager và không có kết nối với cơ sở dữ liệu.
+	Đối tượng tồn tại trong bộ nhớ heap và độc lập với JPA.
+	Trạng thái Persistent: Đối tượng được đưa vào trạng thái này bằng cách sử dụng persist() hoặc merge() và đại diện cho một
+	hàng trong cơ sở dữ liệu. Các thay đổi trên đối tượng sẽ được theo dõi và có thể được tự động cập nhật vào cơ sở dữ liệu
+	khi gọi commit() hoặc flush().
+	Trạng thái Detached: Khi EntityManager đóng hoặc xóa bộ nhớ cache, đối tượng chuyển sang trạng thái Detached,
+	nghĩa là không còn liên quan đến EntityManager. Để đưa đối tượng trở lại trạng thái Persistent, bạn cần thực hiện
+	reattach bằng cách sử dụng các phương thức như merge(), refresh(), update(), hoặc persist() trên một EntityManager mới.
+	Các Phương Thức Phổ Biến khi làm việc với Đối Tượng của EntityManager:
+
+* persist():
+	Dùng để thêm một đối tượng Transient vào trạng thái Persistent trong EntityManager.
+	Câu lệnh INSERT sẽ được sinh ra sau khi gọi commit() hoặc flush().
+	Nếu truyền một đối tượng Detached hoặc Persistent, nó sẽ ném ra lỗi khi gọi phương thức này hoặc khi commit() hoặc flush().
+
+* merge():
+	Mục đích chính của merge() là cập nhật giá trị của một đối tượng Persistent trong EntityManager từ một đối tượng Detached.
+	Khi truyền một đối tượng Detached, merge() sẽ sao chép các giá trị từ đối tượng Detached vào đối tượng Persistent.
+	Khi truyền một đối tượng Transient, merge() tạo một đối tượng Persistent mới trong EntityManager.
+	Nếu truyền một đối tượng Persistent, không có tác động gì.
+	
+* update():
+	Tương tự như save(), update() là một phương thức gốc của Hibernate và không tuân thủ đặc tả JPA một cách chặt chẽ.
+	Mục đích chính của nó là đưa một đối tượng Detached thành một đối tượng Persistent.
+	Không chấp nhận đối tượng Transient, và ném ra lỗi nếu truyền vào đối tượng Transient.
+	
+* saveOrUpdate():
+	saveOrUpdate() chỉ tồn tại trong Hibernate API và có một phiên bản cải tiến của update().
+	Nó tương tự update(), nhưng khi truyền vào đối tượng Transient, nó tạo một đối tượng Persistent mới trong EntityManager,
+	 không ném ra lỗi.
+* entityManager.detach(entity): ngắt kết nối đối tượng với entityManager, tức là loại ra khỏi persistence context.
+* entityManager.refresh(entity): làm mới đối tượng trong pesistence context bằng cách lấy lại từ db.
+* entityManager không có cách nào để clear pesistence context, chỉ khi tạo một entityManager khác.
+
+
+Các phương thức này tương tự với Hibernate nhưng sử dụng EntityManager trong JPA.
+ Khi làm việc với JPA, bạn nên ưu tiên sử dụng persist(), merge(), và saveOrUpdate()
+ theo đúng đặc tả của JPA để đảm bảo tính di động và sử dụng tiêu chuẩn hơn.
+ 
+* Học về entity manager *
+ * Mặc định khi khởi chạy app trong spring boot, spring data jpa sẽ khởi tạo entitymanager trong context, có thể lấy
+	ra dùng luôn.
+EntityManager trong Java Persistence API (JPA) và Session trong Hibernate có nhiều sự khác biệt và tương tự trong việc
+ quản lý đối tượng thực thể và tương tác với cơ sở dữ liệu. Dưới đây là một số khác biệt chính giữa chúng:
+
+* Trạng thái Entity:
+	Trong EntityManager, đối tượng thực thể có 3 trạng thái chính: transient, persistent và detached.
+	Trong Session của Hibernate, có 4 trạng thái: transient, persistent, detached và removed (đối với đối tượng được xóa).
+* Cơ Chế Caching:
+	EntityManager sử dụng first-level cache, được gọi là persistence context, để lưu trữ các đối tượng thực thể trong bộ nhớ tạm thời.
+	Session trong Hibernate cũng sử dụng first-level cache, được gọi là session cache, để lưu trữ các đối tượng thực thể.
+* Truy Vấn SQL:
+	EntityManager sử dụng truy vấn JPQL (Java Persistence Query Language) để truy vấn đối tượng thực thể.
+		và cũng hỗ trợ native query. 
+	Session của Hibernate hỗ trợ truy vấn HQL (Hibernate Query Language) cùng với truy vấn SQL native.
+* Hàm Chấp Nhận Dữ Liệu Trạng Thái:
+	EntityManager cung cấp các phương thức persist(), merge(), và remove() để quản lý dữ liệu thực thể.
+	Session trong Hibernate cung cấp các phương thức save(), update(), delete(), và saveOrUpdate() để quản lý dữ liệu thực thể.
+* Lỗi Gây Ra Bởi Hàm Trong Trạng Thái Không Đúng:
+	Trong EntityManager, gọi remove() trên một đối tượng transient hoặc detached sẽ gây ra ngoại lệ.
+	Trong Session của Hibernate, gọi delete() trên một đối tượng transient hoặc detached cũng sẽ gây ra ngoại lệ.
+* Chuyển Trạng Thái Của Entity:
+	Để chuyển một đối tượng từ transient sang persistent trong EntityManager, bạn sử dụng persist() hoặc merge().
+	Để chuyển một đối tượng từ detached sang persistent trong EntityManager, bạn sử dụng merge().
+	Trong Session của Hibernate, bạn sử dụng save() hoặc update() để chuyển từ transient sang persistent,
+	 và merge() để chuyển từ detached sang persistent.
+* Cách Làm Việc Với Truy Vấn SQL Native:
+	EntityManager sử dụng createNativeQuery() để thực hiện truy vấn SQL native.
+	Session của Hibernate cung cấp createSQLQuery() cho truy vấn SQL native và createQuery() cho truy vấn HQL.
+* Đối Tượng Kết Quả Trả Về:
+	Trong EntityManager, kết quả của truy vấn thường là đối tượng thực thể hoặc danh sách đối tượng thực thể.
+	Trong Session của Hibernate, kết quả truy vấn có thể là danh sách các đối tượng thực thể, danh sách các đối tượng tùy chỉnh,
+	danh sách mảng đối tượng, và nhiều loại dữ liệu khác.
+* EntityManager của JPA không hỗ trợ second - level - cache, nhưng nếu sử dụng EntityManager của hibernate thì có.
+ 
+ 
 
 --------------------------------- SPRING FRAMEWORK - Introducetion ----------------------------- 
+The Spring Framework is a Java platform that provides comprehensive infrastructure support for developing Java applications
+* có nhiều module như dataaccess, Web, core container, AOP, Aspect ...
 
 * Spring Ioc (Inversion of Control)
 	* đảo ngược sự kiểm soát, tức là với code thông thường, các bạn phải khởi tạo một đối tượng để dùng, nhưng với cơ chế IOC,
@@ -692,9 +785,183 @@ cấu trúc thì xem trong  slide.
 	Start server and deploy the project
 	// hãy xem code mẫu trong slide để hiểu rõ hơn.
 
+* Nói một chút về servlet:
+	* servlet như tầng controller trong mvcc, đứng ra để xử lý các request và trả về view hoặc respone http. đó, dễ hiểu.
+	
+--------------------------------------------------- Hết ----------------------------------------------
+
+
+-------------------------------------------- HIBERNATE AND SPRING MVC INTEGRATION ---------------------------
+* từ phần này mình nghĩ các bạn đã có kiến thức để tự đọc hiểu các phần sau rồi.
+* Lưu ý rằng, khi làm việc với các đối tượng để kết nói với db như session hay entitymanager, với các câu lệnh insert, update
+	delete thì phải bắt đầu transaction và đóng, đối với select thì không cần.
+
+* để biết sử dụng messager box error cho nhiều cái trùng nhau, thì xem slide 38 spring mvc component.
+* Tổng quan bài MVC Component.
+	* @RequestParam: dùng để bind parameter được gửi trong url
+		* các tham số cần chú ý: value, require, bắt kiểu optional, bắt vào một list.
+	* @ModelAtribute: dùng để bind dữ liệu trong body vào biến, có thể bind nhiều kiểu ảnh, video, file ...
+	* @RequestBody: dùng để bind dữ liệu trong body vào biến, không bind được dữ liệu ảnh, video, file ...
+
+* Tông quan bài Validation và Intercepter
+	* cần biết: @ControllerAdvice, @ExceptionHandler, @ResponseSatus,
+	* @ControllerAdvice: là bean class, bắt tất cả các exception được ném ra từ controller.
+	* @ExceptionHandler: định nghĩa phương thức để xử lý exception cụ thể.
+	* @ResponseSatus: định nghĩa status http của exception trả về, nhưng trong thực tế, đều trả về ResponseBody, có set
+	status trong đó hết, nên không cần dùng.
+
+
+-------------------------------------------- Spring Boot ----------------------------------------------
+* trước khi vào, ôn lại chút spring framework là gì?
+	* spring framework không hẳn là một framework, nó là một flatform của java dành cho việc phát triển application,
+	nó cung cấp rất nhiều module để làm việc, dataaccess, web, core container, aop ...
+	* có hai khái niệm quan trọng khi làm việc với spring là IOC và DI nằm trong module core container.
+	* nó vẫn còn khá cồng kềnh trong việc phát triển application, chúng ta có thể thấy, việc config các công nghệ sử dụng
+		và bean cần thiết vẫn còn khá phức tạp, cta phải config bằng xml, spring ko bt tự động config cho cta, như config
+		hibernate, dispatcherservlet, spring-servlet.xml, ... làm việc với xml khá bất tiền vì cú pháp ko thân thiện.
+	* chương trình nào mà chả dùng dispatcherservlet đko, tại sao spring framework không config luôn cho cta?
+	* khi muốn chạy chương trình, mà muốn nhận đc yêu cầu http, ta lại phải cài thêm các web server vào ide, và chọn webserver
+		khi khởi chạy chương trình, bất tiện đko
+	* và spring boot ra đời để giải quyết những vấn đề này.
+	
+	
+* Spring boot là một spring module cung cấp RAD fearture cho spring framework, Rapid Application Development.
+* Spring boot là mã nguồn mở, dùng cho việc phát triển micro service.
+* Spring boot là một project được built trên spring framework, nó giúp dễ dàng và tăng hiệu suất trong việc setup, config
+	và run app.
+* Spring boot đưa ra 3 lý do sau cho developer:
+	* Easy to understand and develop spring applications
+	* Increases productivity
+	* Reduces the development time
+* Spring boot là sự kết hợp của spring framework, cộng với web server (tomcat, jetty ...) + @Configuration = Spring boot.
+
+
+* Spring Boot Annotations *
+	* @SpringBootApplication: nằm ở hàm main của chương trình, nó là gộp của anotation sau:
+		* @EnableAutoConfiguration: enable auto-configuration mechanism.
+		* @ComponentScan: enable @Component scan.
+		* @SpringBootConfiguration: register extra beans in the context
+	* khi chạy hàm main, spring sẽ tự động scan các component trong packagecon, bootstrap các file properties hay yml
+		và load vào spring context.
+	* nên nhớ rằng, mọi component muốn được load thì phải nằm trong package con của package chứ hàm main.
+	* với spring boot, mói thứ cấu hình bạn chỉ cần đặt trong file properties hoặc yml.
+	* spring boot có nhiều dependencies hữu dụng, xem slide spring boot basic.
+
+* Nói một chút cho các bạn phân biệt về mô hình mvc và rest api trong spring boot chạy như thế nào?
+	* như bạn đã biết, dispatcherservlet sẽ nhận mọi request, tham khảo handlerMapping và đưa vào Controller
+	* nếu trong mô hình mvc, dữ liệu sẽ được bind vào model và trả về view, dispatcherservlet lại dựa vào viewResolver
+		để tìm view vật lý và bind model vào đó, và trả về một trang html mới.
+	* nhưng với rest api, controller lại trả về một http response, chứ không phải là một view, và dữ liệu trả về thường
+		là json. bên frontend có trách nhiệm nhận và xử lý data.
+	* đó là sự khác biệt, chỉ là cắt gọn đi đoạn sau.
+	* khi spring boot chạy, các bạn sẽ thấy dispatcherservlet đc tự động khởi động.
+	
+--------------------------------------------- SPRING DATA JPA -----------------------------------------------------
+* bây giờ chúng ta sẽ học một thư viện mới của spring framwork, kết nối với cơ sở dữ liệu cực gi dễ dàng.
+
+* Spring data jpa là một module của spring framework, mục tiêu của module này là để giảm số lượng code khi làm việc với
+	db, hỗ trợ hibernate.
+* sdj không phải là một jpa provider, nó là một thư viện, framework thêm vào lớp abtraction xây dựng bên trên jpa provider,
+	cụ thể ở đây là hibernate.
+* nếu sử dụng sdj, tầng repository của app sẽ chia làm 3 tầng chính: spring data jpa, spring data common, jpa provider.
+	* tầng spring data jpa hỗ trợ tạo jpa repository bằng việc extend các interfaces
+	* tầng spring data common gồm các cấu trúc repo, các bạn sẽ học phần sau.
+	* tầng jpa provider là tầng triển khai jpa, cụ thể hibernate.
+
+* Một lưu ý nhỏ khi các bạn xem thư viện của spring data jpa, các bạn sẽ thấy interface kế thừa interface, đó là interface
+	inheritance, khi bạn muốn chia tách các interface cha con. interface con có thể có giao diện của lớp cha. interface
+	không thể implement interface nhé.
+	* abstract class cũng như thế, nếu bạn muốn kế thừa lớp cha mà không muốn triển khai các phương thức abstract của lớp cha
+	thì lớp con bạn kế thừa cũng phải là một lớp abstract.
+
+* Spring Data Commons: bao gồm các interface sau đây, xắp xếp từ trên xuống dưới, trên là interface cha, dưới là interface con
+	* Repository<T, ID extends Serializable> interface
+	* CrudRepository<T, ID extends Serializable> interface
+	* PagingAndSortingRepository<T, ID extends Serializable> interface // có hai phương thức findall, nhận vào pageable và sort
+	* JpaRepository<T,ID> // con dưới cùng, có tất cả phương thức của interface bên trên, sử dụng cái này nhiều nhất.
+	* để biết thêm ở trong đó có những cái gì, xem slide.
+	
+	* ngoài ra, còn có hai interface nữa nhưng đứng độc lập:
+		* QueryDslPredicateExecutor interface: chủ yếu nhận tham số vào là pridicate.
+		* JpaSpecificationExecutor interface: chủ yếu nhận vào là một specification.
+* Pagination và Sorting
+	Pageable firstPageWithTwoElements = PageRequest.of(0, 2);
+	Pageable sortedByPriceDesc = PageRequest.of(0, 3, Sort.by("price").descending());
+	// Pageable là một interface, đối tượng pageable được tạo thông qua pagerequest, các bạn có thể tham khảo thêm để biết
+	nhiều hơn về phần này.
+	// ví dụ: Page<Product> findByPriceLessThan(double price, Pageable pageable);
+* Query Method // tự đọc trong slide để hiểu nhé, rất dễ đọc.
+
+* Còn 3 Slide nữa, đa số đã làm trong project, nên có thể tự đọc và nhớ lại.
+
+----------------------------------------------- RESTful Web Services -------------------------------------------
+
+* The spring-boot-starter-web has built in jackson-databind, which helps to convert JSON into Java object and vice versa.
+* @RestController:
+	The @RestController annotation was introduced in Spring 4.0 to simplify the creation of RESTful web services.
+	It's a convenience annotation that combines @Controller and @ResponseBody – which eliminates the need to annotate
+	every request handling method of the controller class with the @ResponseBody annotation
+	* @ResponseBody sẽ bind dữ liệu trả ra là ResponseEntity thành json của mỗi method.
+* @Path: used to specify the relative path of class and methods. We can get the URI of a webservice by scanning the Path annotation value.
+* @GET, @PUT, @POST, @DELETE and @HEAD: used to specify the HTTP request type for a method.
+* @Produces, @Consumes: used to specify the request and response types.
+@PathParam: used to bind the method parameter to path value by parsing it
+
+* Annotation @RequestBody ánh xạ phần nội dung HttpRequest tới một transfer/domain object,
+ cho phép tự động deserialization trên phần nội dung HttpRequest vào đối tượng Java.
+ Spring tự động giải mã JSON thành một kiểu Java, giả sử một kiểu thích hợp được chỉ định.
+
+* The @ResponseBody annotation tells a controller that the object returned is automatically serialized into JSON and
+ passed back into the HttpResponse object
+
+* Remember, we don't need to annotate the @RestController-annotated controllers with the @ResponseBody annotation
+ since Spring does it by default.
+* nếu không muốn spring tự động trả về kiểu json, thì ta có thể cài đặt lại trong @RequestMapping attribute 'produces'
+	produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }
+	produces = { "application/json" , "application/xml" }
+
+* ResponseEntity represents the whole HTTP response: status code, headers, and body.
+	As a result, we can use it to fully configure the HTTP response.
+	new ResponseEntity<>("Custom header set", headers, HttpStatus.OK); // tham số đầu là dữ liệu, rồi header, httpstatus,
+																		không cần header cũng đc.
+	
+	* ResponseEntity provides two nested builder interfaces: HeadersBuilder and its subinterface, BodyBuilder. 
+		Therefore, we can access their capabilities through the static methods of ResponseEntity.
+		ResponseEntity.ok("Hello World!"); // đây là phương thức static, của lớp ResponseEntity, build nhanh hơn.
+		// còn có các phương thức khác như:
+			BodyBuilder accepted();
+			BodyBuilder badRequest();
+			BodyBuilder created(java.net.URI location);
+			HeadersBuilder<?> noContent();
+			HeadersBuilder<?> notFound();
+			BodyBuilder ok();
+			
+			// kiểu bodybuilder trong đó có body() trả về một ResponseEntity, contentType() trả về BodyBuilder, contentLength()
+			// nói chung không cần tìm hiểu quá sâu.
+		
+		return ResponseEntity.ok().body("Year of birth cannot be in the future"); // ví dụ như này.
+		ResponseEntity.status(HttpStatus.OK).body("Your age is " + calculateAge(yearOfBirth)); // status cũng là static.
 
 
 
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+	
+	
+	
+	
 	
 
  
