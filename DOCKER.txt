@@ -1,0 +1,86 @@
+** Docker **
+
+*Lession 01*
+	1. Docker là gì?
+		- Image: là các bộ cài như MySQL, Ubuntu ...;
+		- Container: là máy ảo được tạo ra từ Image;
+		- DockerHub: là nơi quản lý các Image (giống github);
+		- Dockerfile: là một tập tin bao gồm các chỉ dẫn để build một image;
+		- Volume: lưu data ra ngoài container;
+		- Docker-Compose: edit docker file
+	2. Cài đặt Docker trên window.
+		* enable 2 feature của window
+			- hyper-v (WSL2 - Linux)
+			- window powersell
+	3. Check version.
+		* docker -- version
+		* docker-compose --help
+
+
+
+1. Basic command for image
+	* docker image pull <image> : pull image from docker registry to local
+	* docker image pull <image>:<tag>: pull image from docker registry to local with tag, if no tag, it will pull the lastest.
+	* docker image push <image>:<tag>: push image from local to docker registry.
+	* docker image ls | docker images: list all images in local.
+	* docker image prune: delelte image does not in use.
+2. Basic command for container.
+	* docker container run <image>: run image in nomal mode.
+	* docker container ls | docker container ls -a : list all container.
+	* docker ps | docker ps -a: list all up and exited container.
+	* docker container stop <container_id>: stop container.
+	* docker container prune: delete all exited container.
+	* docker container exec <container_id> <command> : execute command in container in out shell.
+3. what is PID 1?
+	* container là một máy ảo được chia sẻ phần mềm, nghĩa là nó được chia sẻ các tiến trình để chạy, nó không có hệ hiều hành
+	và phần cứng riêng như vmware hay virtual box, và tiến trình chính của container được gọi là PID1, đây là một shell để giao
+	tiếp và biểu thị container đang hoạt động, nếu tiến trình này mất đi, container sẽ dừng hoạt động, vì thế, khi xem container
+	chạy, bạn sẽ thấy phần command là /bin/sh . sh ở đây là shell.
+	* Vì thế khi bạn chạy một container , nó sẽ bị exit luôn tại vì tiến trình chủ đạo đã dừng, vì bạn không ở trong shell, vì
+	thế, muốn container chạy ngầm thì bạn phải thêm cờ -it hoặc chạy ở chế độ detach:
+	
+	* docker run -it <image>
+	* docker run -d <image>: chạy ở chế độ detach.
+	
+	* khi bạn đang ở trong shell chính, tức là ở PID1, muốn thoát thì ấn control+d và container sẽ kết thúc, nếu muốn thoát khỏi
+	shell mà không làm cho PID1 kết thúc thì ấn control + p + q.
+	
+	* docker attach <container_id>: quay lại tiến trình PID1 của container.
+	
+	* docker exec -it <container_id> sh: sh ở đây là shell, lệnh này giúp bạn vào container nhưng ở một tiến trình phụ, không
+	phải PID1, nên nếu bạn control+d tắt tiền trình này đi thì container vẫn chạy, đây là cách để vào một container để điều khiển.
+	
+	* docker exec -it <container_id> bash: cũng giống như ý trên, bash cũng giống như shell, là tiến trình giúp giao tiếp với container
+	ví dụ mình dùng git bash để giao tiếp với git local.
+4. Port Mapping.
+	* ví dụ chúng ta có một reverse proxy (nginx), chúng ta có chạy một container nginx, và nginx này lắng nghe ở
+	port 80 (http) của docker container, nghĩa là chúng ta phải ở trong container và gọi đến port 80 của container bằng câu lệnh,
+	nhưng điều này không hợp lý khi muốn gọi bằng broswer ở máy local, điều này có thể giải quyết bằng port mapping.
+	* tức là ta sẽ mapping port 80 của máy local với port 80 của container, và khi gọi localhost:80 của máy local, sẽ mapping
+	đến port 80 của container nginx và nginx sẽ lắng nghe và trả lại resourse.
+	
+	* docker run -p <target_port>:<container_port> <image>: câu lệnh này để mapping hai port.
+	
+	* example: docker run -p 80:80 nginx.
+	
+	* docker log -f <container_id>: show log của container khi đang chạy, -f nghĩa là follow theo.
+
+5. Volume - bind mount
+	* khi chạy container mysql, vấn đề đặt ra khi tắt container đi, thì mọi dữ liệu trong container sẽ mất, giải pháp mà
+	docker đưa ra là dùng volume.
+	* volume là môt thư mục ảo tạo ra để lưu data bới docker engine, nghĩa là mình sẽ link volume với thư mục lưu data của
+	mysql, mọi dữ liệu của mysql container sẽ được bind ra volume, khi stop container, thì dữ liệu ở volume vẫn còn.
+	* docker volume create <volume-name>: tạo một volume
+	* docker run -v <local_dir/volume>:<container_dir>: khởi chạy một container gắn với một volume.
+	
+	* example:
+		* docker volume create pgdata: tạo volume postgre data.
+		* docker run -v pgdata:var/lib/postgresql/data -p 5432:5432 postgre: chạy container postgre, port mapping 5432
+		gắn với volume pgdata.
+6. DockerFile
+	* dockerfile chứa các bước hướng dẫn docker engine thực hiện để tạo image riêng.
+	* structure:
+		FROM alpine:lastest
+		RUN apk add bash
+		CMD ["bash"]
+	
