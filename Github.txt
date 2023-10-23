@@ -13,3 +13,256 @@
 	nếu bạn chưa commit thay đổi ở nhánh fearture1 mà chuyển sang nhánh master, git sẽ mang mọi thay đổi ở nhánh fearture1
 	sang nhánh master, đây là lý do tại sao code lại đc cập nhật ở cả hai nhánh, đây chỉ là một cơ chế bảo vệ của git và
 	giúp các developer dễ dàng trong việc quản lý và mang code đi mà không cần commit và merge.
+
+* Undo lại commit.
+* git reset --soft HEAD~1: sẽ trở về lần commit trước và không xóa đi nhưng thay đổi từ lần commit trước trở đi.
+* git reset --soft HEAD~1: sẽ trở về lần commit trước và sẽ xóa tất cả các thay đổi đã commit, cái nào chưa commit sẽ
+	không bị xóa.
+
+* Git stash được sử dụng khi muốn lưu lại các thay đổi chưa commit, hay sử dụng khi bạn chuyển qua một branch khác
+	mà branch hiện tại đang làm chưa xong. khá hay khi bạn muốn làm sạch branch hiện tại mà muốn chuyển sang nhánh khác.
+	* git stash save <noidung>: lưu lại trạng thái hiện tại của branch, mỗi lần lưu sẽ tạo một version khác nhau.
+	* git stash list: xem danh sách đã lưu.
+	* git stash list -p: xem nội dung của từng lần thay đổi.
+	* git stash show stash@{1}: xem nội dung cụ thể của thay đổi lần 1.
+	* git stash apply stash@{1}: áp dụng thay đổi lần 1 cho nhánh hiện tại.
+	* git stash drop stash@{1}: xóa stash
+	* git stash pop stash@{1}: kết hợp của apply và drop.
+	* git stash clear: clear toàn bộ stash.
+	// từ nay đã biết stash, sử dụng stash để chuyển nhánh và lưu các version nhé.
+
+* git branch -d old-branch // delete need to merge.
+* git branch -D old-branch // delete no need to merge.
+
+* git add . // đưa file cho git quản lý.
+* khi merge nhánh master vào nhánh con, đôi khi git sẽ bắt commit, bạn chỉ cần commit và sau đó merge, điều này chỉ để
+	làm rõ lịch sử commit.
+	
+* Làm việc với SSH trong git *
+SSH key
+
+-- git init
+-- ssh-keygen -t rsa -> create ssh key
+-- go into ssh key // "cd /c/.../ssh/"
+-- vi rsa.pub // copy ssh key
+-- mở github tạo ssh key mới.
+-- open github anf create new ssh key.
+-- Connect ssh url
+
+// Using many accounts github in windows by ssh key.
+* Example: one github account for personal, one for work.
+* Create two ssh keys with different name.
+* Now your computer have two ssh keys, you need to config what key using for personal, what key using for work.
+* Go into folder /.ssh contains your ssh key, create file name "config" without suffix, and paste these into to config
+	#Default GitHub
+	Host github.com -> this is for personal, this is host git in your local repository, and it must be different from other	host.
+ 		HostName github.com -> if you using github, set github. if you using gitlab, set gitlab.com
+  		User git
+  		IdentityFile ~/.ssh/id_rsa -> this is private key you created, different host different private key.
+
+	#Default GitHub
+	Host github-school -> this is for work
+  		HostName github.com
+  		User git
+  		IdentityFile ~/.ssh/id_rsa_school
+* When set remote origin for git local repository, you have to determine what host you want to set for this url.
+	* Example
+		* When you want to set this url "git@github.com:ThienVuVan2003/BookStoreBE.git" for host personal, let it defaul
+		* When you want to set this url "git@github.com:VVThienSchool/LapTrinhWeb.git" for work
+		  You have to change host local git for this url by replace "github.com" by "github-school"
+		  Url change to "git@github-school:VVThienSchool/LapTrinhWeb.git"
+	  	  Now, when you work with remote repo, git will send private key of github-shcool host, not private key of github.com
+		  host.
+* Note: How does SSH KEY work between local repo and remote repo?
+	* When you create pair of ssh key, you have two files "id_rsa" and "id_rsa.pub" (name depends on you set)
+	* is_rsa is private key, you must to keep this key secured in your computer.
+	* id_rsa.pub is public key, you must to set this key into your github account.
+	* Now when you push or actions, your local git repo will send via private key, github will compare public key via private
+		key, if success, you can work via 	  remote repository.
+	
+	
+	
+------------------------------------------------------ Phần Docs -----------------------------------------------------
+GitLearn
+I.	Các thuật ngữ trong GIT
+•	Git Flow
+•	Branch
+•	Pull Request (PR)
+•	Review
+•	Merge
+•	Release
+•	Deploy
+II.	Nơi lưu trữ code phổ biến
+•	github
+•	bitbucket
+•	backlog
+III.	Cài đặt Git trên Windows
+•	Các lệnh thao tác với thư mục: cd/mkdir/rm/vi/pwd
+
+IV.	Cấu hình git
+•	Trước khi làm việc với git phải tiến hành cấu hình
+•	Mọi dữ liệu được bạn tạo ra ở git sẽ ăn theo thông tin cấu hình này
+•	Chú ý không cấu hình sẽ không chạy được 1 số câu lệnh như commit, clone, stash …
+•	Lệnh cấu hình Tên và Email
+	git config --global user.name "Tên của bạn"
+	git config --global user.email "Email của bạn"
+	git config –list : Kiểm tra lại config xem đã đúng chưa
+
+V.	Repository
+•	Repository là gì: Là kho lưu trữ dữ liệu của 1 dự án
+•	Local Repository: Là repo phía local của developer, nó được đồng bộ lên remote repo khi bạn làm việc với git
+•	Remote Repository: Là repo được lưu trữ ở git trung tâm ví dụ như github, bitbucket, backlog
+
+•	Lệnh tạo repo
+	mkdir [tên dự án]
+	cd [tên dự án]
+	git init
+
+VI.	Git Branch
+•	Branch là gì
+•	Trong 1 dự án có nhiều task vụ khác nhau, chính vì vậy người ta phải dùng branch để phân nhánh mỗi task vụ đó thành 1 branch riêng biệt để lưu lại luồng lịch sử làm việc cho toàn bộ dự án. Branch đã phân nhánh sẽ không ảnh hưởng đến branch khác nên có thể tiến hành nhiều thay đổi đồng thời trong cùng 1 repository
+•	Branch Master
+•	Branch Release(Staging)
+•	Branch Develop
+•	Branch Feature
+•	Branch Hostfix
+
+VII.	Các lệnh liên quan tới branch
+•	Khi 1 repo mới được tạo ra thì nó sẽ chưa tồn tại bất kỳ nhánh nào, để khởi tạo 1 branch thì ta phải lưu trữ trong branch ít nhất 1 file thì nó sẽ mặc định tạo ra branch master đầu tiên
+•	Ví dụ:
+	Step 1: Tạo file hello.txt
+	echo “Hello Tin Hoc That La Don gian”　＞　hello.txt
+	Step2: Chạy lệnh git add để thêm file vào git history
+	git add hello.txt
+	Step3: 
+	git commit -m “Dua file hello.txt vao nhanh”
+
+•	Lệnh xem các branch đang có trong repo
+	git branch
+
+•	Lệnh tạo branch
+	Tạo branch mới và đứng nguyên ở branch hiện tại 
+	git branch [tên branch]
+	chú ý: khi bạn đang đứng trong 1 branch để tạo 1 nhánh mới thì, nhánh mới được tạo ra sẽ copy toàn bộ dữ liệu của nhánh hiện tại qua 1 nhánh mới
+	Tạo branch mới và chuyển luôn qua branch mới
+	git checkout -b [tên branch mới]
+
+•	Lệnh xem trạng thái thay đổi của 1 branch
+	git status
+
+•	Lệnh chuyển đổi giữa các branch
+	git checkout [tên branch]
+	Chú ý: trước khi chuyển branch phải commit code lên branch hiện tại không thì code sẽ bị mất
+
+•	Lệnh đưa dữ liệu lên 1 branch: git add và git commit
+	Trước khi đưa dữ liệu lên 1 branch bạn phải dùng lệnh git add để khai báo bạn muốn đưa những gì lên nhánh
+	Đưa từng file
+	git add [file 1] [file 2] [thư mục 1/*]
+	Đưa toàn bộ những thanh đổi lên branch
+	git add .
+	git commit -m “Comment nội dung mà bạn đưa lên brach”
+
+•	Bài tập
+	Step 1: Tạo dự án [tên dự án]
+	Step 2: Chuyển vào dự án tạo ở bước 1
+	Step 3: Khởi tạo repository cho dự án
+	Step 4: Tạo 1 file và đưa lên nhánh master
+	Step 5: Tại master tạo ra 3 nhánh, develop, nhanh1, nhanh2
+	Step 6: Chuyển qua nhanh1 và tạo 1 file bất kỳ, sau đó đưa code lên nhánh 1
+	Step 7: Quay nhánh develop và nhánh nhanh2 kiểm tra xem co file bạn tạo ra ở bước 6 không? nếu không có thì là đúng
+
+•	Lệnh Git merge branch
+	git merge ＜tên nhánh＞
+
+	ví dụ có 2 nhánh A và B tiến hành merge A vào B
+	Step 1: git checkout [nhánh A]
+	Step 2: git merge B
+
+•	Xử lý conflict(xung đột) khi merge code
+	Đoạn bị xung đột được bắt đầu bằng ＜＜＜＜＜＜＜ HEAD và kết thúc tại ＞＞＞＞＞＞＞ 
+	Sửa conflict xong thì tiến hành đưa lại nội dung lên branch được merge vào
+
+	Step 1: Tiến hành sửa conflict
+	Step 2: Sau khi sửa thì tiến hành đưa lại code muốn merge lên nhánh muốn merge
+	git add .
+	git commit -m “Sửa conflict”
+
+•	Xóa branch
+	Khi toàn bộ dữ liệu trên branch đó đã được merge vào master thì dùng lệnh sau để xóa
+	git branch -d ＜tên branch cần xóa＞
+	Chú ý: với câu lệnh trên thi bắt buộc dữ liệu thì branch muốn xóa phải được merge vào master, không thì bạn sẽ nhận được báo lỗi
+	Trường hợp branch muốn xóa chưa được merge vào master thì bạn phải dùng câu lệnh
+	git branch -D ＜tên branch cần xóa＞
+	Chú ý: trường hợp này toàn bộ các commit lên branch này sẽ bị mất
+
+•	Xem trạng thái hiện tại của 1 nhánh
+	git status
+
+VIII.	Thay đổi nội dung commit lần trước
+•	Lệnh tra lại lịch sử
+	git log
+•	Sửa lại message commit bị nhầm
+	git commit --amend
+•	Trường hợp add thiếu file hoặc sửa lại file đã commit
+	git add [file bị thiếu hoặc file cần sửa lại]
+	git commit --amend
+
+•	Undo lại commit
+	Trường hợp 1: Muốn "undo" thay đổi trên một file cố định trước khi commit
+	git checkout -- [đường dẫn/tên file]
+
+•	Nếu muốn undo hẳn một commit (do đã lỡ commit xong rồi) thì cần chỉ định mục tiêu
+	git reset --soft HEAD~1
+	Ở đây HEAD~1 nghĩa là trước 1 commit. Mình dùng soft để lưu lại những thay đổi chưa commit và chỉ bỏ đi phần đã commit từ lần trước
+
+	Nếu muốn bỏ cả phần đã commit từ lần trước và phần chưa commit thì đổi soft thành hard
+	git reset --hard HEAD~1
+
+•	Git Clean
+	Xóa hết các files chưa được commit
+	git clean --force
+
+IX.	Thay đổi tên tác giả của commit
+	git config user.name "Nguyen Van Doanh"
+	git config user.email doanh@gmail.com
+	git commit --amend --reset-author
+
+X.	Git Remote
+•	Tạo tài khoản github
+•	Tạo repository trên github
+•	Thêm remote repository vào local repository
+	git remote add origin [git remote url]
+•	Check lại xem thêm vào ok hay chưa
+	git remote -v
+•	Thay đổi link
+	git remote set-url origin [git remote url]
+•	Đưa code từ local repo lên remote repo
+	git add .
+	git commit -m “commit comment”
+	git push origin [tên remote branch]
+
+•	Git clone thông qua HTTPS (git fetch and git pull and pull request) - video
+•	Git clone thông qua SSH - video
+	ssh-keygen -t rsa
+
+XI.	Git  Stash
+•	Git stash được sử dụng khi muốn lưu lại các thay đổi chưa commit, hay sử dụng khi bạn chuyển qua một branch khác mà branch hiện tại đang làm chưa xong.
+
+•	Các lệnh liên quan
+•	Lưu lại trạng thái hiện tại của branch
+	git stash save
+•	Lưu lại toàn bộ trạng thái hiện tại của branch
+•	Mỗi lần lưu sẽ tạo thành 1 version tại thời điểm đó
+•	Xem lại danh sách đã lưu
+	git stash list
+•	Nếu muốn xem cả nội dung của từng thay đổi thì thêm option -p
+	git stash list -p
+•	hoặc xem nội dung cụ thể hơn nữa của lần thay đổi thứ 1:
+	git stash show stash@{1}
+•	Lấy lại thay đổi
+	git stash apply stash@{1}
+•	Xóa
+	git stash drop
+XII.	Học SourceTree, dùng git bằng UI.
+
+

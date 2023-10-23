@@ -1,4 +1,4 @@
-											<<<<<<- How Does Spring Security Work? Let Me Explain It ->>>>>
+						<<<<<<- How Does Spring Security Work? Let Me Explain It ->>>>>
 
 		1.Spring Security Architecture / Flow
 
@@ -40,4 +40,4 @@
 				* and set into SecurityContextHolder to Authorization
 				* go to endpoint
 
-										--------------------------------- End --------------------------------------
+						--------------------------------- End --------------------------------------

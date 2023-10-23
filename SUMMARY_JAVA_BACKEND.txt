@@ -941,6 +941,54 @@ cấu trúc thì xem trong  slide.
 		
 		return ResponseEntity.ok().body("Year of birth cannot be in the future"); // ví dụ như này.
 		ResponseEntity.status(HttpStatus.OK).body("Your age is " + calculateAge(yearOfBirth)); // status cũng là static.
+		
+
+---------------------------- SPRING SECURITY & SPRING BOOT WEB APPLICATION -----------------------------------
+* spring securiry là giải pháp bảo mật toàn diện cho java ee, và hỗ trợ các dự án xây dựng bằng spring framework.
+* spring securiry là một module chính khác của spring distribution, và support cho app sử dụng jdk 1.5 trở lên.
+* spring security chú trọng vào authentication và authorization.
+* spring security được thành nhiều file jar, nhưng spring-security-core.jar là bắt buộc.
+
+* Các đối tượng chính khi làm việc với spring security.
+	* Principal: không phải là đối tượng, tượng trưng cho một login user, thông tin user gọi là credential.
+		Authentication Object có phương thức getPrincipal để  lấy credentail.
+		
+	* GrantedAuthority: là interface, triên khai là SimpleGrantedAuthority, chứa tên role của principal.
+	
+	* SecurityContext: là nơi chưa Authentication sau khi confirm true.
+	
+	* SecurityContextHolder: là đối tượng cung cấp truy cập đến SecurityContext.
+	
+	* AuthenticationManager: là đối tượng chỉ định tiến trình authenticate.
+	* AuthenticationProvider: là đối tượng cần thiết để tạo ra AuthenticationManager, hai thứ cần cung cấp cho đối tượng
+		này là PasswordEncoder và UserDetailsService.
+		* đối tượng này chịu trách nhiệm gọi đến UserDetailsService để lấy UserDetails, và so dùng PasswordEncoder để
+		so sánh password hai bên nhập.
+		
+	* UsernamePasswordAuthenticationToken: là đối tượng chứa principal để cho AuthenticationManager authenticate.
+		cụ thể là chứa username và password. còn principal ở trên không phải là đối tượng, chỉ là một tên tượng trưng.
+		
+	* Authentication Object: là đối tượng chứa Principal, và là đối tượng được sinh ra nếu principal được confirm true.
+		chứa login credential trong principal.
+		* tùy vào cách mình implement hay tự cho spring implememt interface Authentication, nếu trong luồng login thì
+			sẽ tự để cho spring tự triển khai, khi đó getPrincipal() sẽ trả về UserDetail.
+		* nếu muốn triển khai lại thì getPrincipal() có thể trả lại username hoặc gì đó.
+		* trong project thực tế, mình triển khai lại Authentication tại luồng authen jwt, vì luồng này không sử dụng
+			AuthenticationManager nên spring không tự sinh ra đối tượng Authentication, nên phải triển khai lại mới]
+			có cái dùng và set vào context, để spring dựa vào context lấy role mà access vào api.
+			
+	* UserDetailsl: là đối tượng được tạo ra nhờ lấy data của user và gắn vào, và đưa mang đi xác thực.
+	
+	* UserDetailsService: là đối tượng trịu trách nhiệm load data và tạo ra UserDetails bằng hàm loadByUsername() và mang đi
+		xác thực.
+	
+	// Chi tiết xem luồng đi của spring security, tìm file JWT_SECURITY để đọc.
+	// xem code trong project.
+	
+	
+
+	
+	
 
 
 

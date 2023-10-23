@@ -227,22 +227,20 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 			sout(i); output: 2
 			
 * Bàn về hướng đối tượng.
-	* Java là một ngôn ngữ hướng đối hoàn toàn, mọi thứ khởi tạo đều nằm trong class.
+	* Java là một ngôn ngữ hướng đối hoàn toàn.
+	* OOP (Oriented Object Programming): làm mô hình lập trình chương trình theo class và object, class là khuôn mẫu để tạo
+	ra object, object là thực thể thật được tạo ra từ class.
 	* OOP có bốn tính chất sau: polymorphism, Inheritance, Enclapsulation, Abstraction.
-	* enclapsulation: tính đóng gói, tính đóng gói tức là mọi thuộc tính và phương thức của class đều được khai báo
-	và thuộc về class, đặc trưng cho tính đóng gói là access modifier, phạm vi truy cập của thuộc tính, mục đích là để tăng
-	độ bảo mật cho dữ liệu và chương trình.
-	
-	* inheritance: tính kế thừa, mục đích là để tối ưu code, rút gọn code, class con có thể kế thừa class cha để sử dụng lại
-	các thuộc tính chung, tránh lãng phí code.
-	
-	* Polymorphism: tính đa hình, một class có thể được biến thành nhiều class khác nhau tại cùng một thời điểm,
-	đặc trưng cho tính đa hình cần tính inheritance và hai phương thức quan trọng là overiding và overloading.
-	
-	* abstraction: tính trừu tượng, là cách tổ chức một class khi chỉ biết chức năng (method) của class, mà không quan tâm đến
-	method đó được triển khai như thế nào, chỉ biết nó là chức năng của class này hoặc của class implement nó. các phương thức
-	đó gọi là abstract method, làm nên abstraction là interface và abstract class, chúng ta đã tìm hiểu hai kiểu class này 
-	trong phần trước.
+	* enclapsulation - tính đóng gói: nghĩa là mọi properties và method đều được đóng gói lại thành một class, và các class
+		được đóng lại thành package, đặc trưng làm nên tính đóng gói là access modifier, giúp bảo toàn và bảo mật dữ liệu cho
+		đối tượng và chương trình.
+	* inheritance - tính kế thừa: mục đích là để tái sử dụng lại các properties và methods của lớp khác mà không cần triển
+		khai lại. giúp tiết kiệm code, thời gian và dễ mở rộng chương trình.
+	* Polymorphism - tính đa hình: tính đa hình có nghĩa là một đối tượng có thể triển khai một phương thức theo nhiều
+		cách khác nhau, overloading sẽ đặc trưng cho điều này. và cái thứ hai là nhiều đối tượng có thể sử dụng chung một
+		phương thức nhưng theo những cách khác nhau, đặc trưng cho điều này là inheritance và overiding.
+	* abstraction-tính trừu tượng: là class chỉ cung cấp đủ cho người dùng biết các phương thức mà không đi quá chi tiết
+		vào cách triển khai của các phương thức này, đặc trưng cho abstraction là interface và abstract class.
 
 * Bàn luận về casting trong java.
 	* trong java có hai kiểu dữ liệu, nên cũng có hai kiểu casting, primitive casting và reference casting.
@@ -353,15 +351,23 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 * Bàn về access modifier trong java.
 	* Trong java có nhiều loại access modifier: public, private, protected, default, static, abstract ...
 	* Bàn về bốn loại chính hay dùng với biến trong class: public, private, protected, default.
+	
 	* Public: biến hay phương thức public có thể được truy cập qua đối tượng được khởi tạo mọi nơi trong chương trình,
 		public được áp dụng khi khai báo class.
+		
 	* Default: biến hoặc phương thức default được truy cập trong class và từ các đối tượng được khởi tạo trong cùng package,
 	nếu đối tượng được khởi tạo không cùng package của class sẽ không truy cập đc các default properties và method. và các
 	class con không thể truy cập được biến và phương thức của lớp cha nếu khai báo trong package khác. 
+	
 	* Protected: biến và phương thức khai báo với protected được truy cập trong class, được truy cập trong class con khai báo
-	ngoài hoặc bên package, được truy cập với đối tượng khởi tạo trong cùng package, nhưng không truy cập được đối với đối tượng khởi tạo ngoài package.
+	ngoài hoặc bên package, được truy cập với đối tượng khởi tạo trong cùng package, nhưng không truy cập được đối với đối tượng
+	khởi tạo ngoài package.
+	
 	* Private: các biến và đối tượng private chỉ được truy cập trong lớp, không được truy cập ở bất cứ đâu nữa.
+	
 	* class chỉ có access modifier là public, abstract;
+	
 	* properties và methods có các access modifier là public, private, protected, default, static, abstract;
+	
 	* Constructor có các access modifier là public, private, protected, default;
 	
