@@ -78,7 +78,7 @@ SSH key
 	* is_rsa is private key, you must to keep this key secured in your computer.
 	* id_rsa.pub is public key, you must to set this key into your github account.
 	* Now when you push or actions, your local git repo will send via private key, github will compare public key via private
-		key, if success, you can work via 	  remote repository.
+		key, if success, you can work via remote repository.
 	
 	
 	
