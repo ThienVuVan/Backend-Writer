@@ -13,9 +13,12 @@
 	* từ lần sau ssh bằng tên user, ip và password.
 	* ip của server phải được bảo mật, để tránh các cuộc tấn công như DOS, DDOS. lộ ip rất có thể sẽ phải đổi server.
 		phần này sẽ được hướng dẫn ở phần sau.
+	
+	// các bước chi tiết và câu lệnh sẽ được diễn giải chi tiết sau.
 		
 * các bước để deploy springboot lên server.
 	* chạy câu lệnh build chương trình.
+		'mvn clean package'
 	* vào lấy file jar đã được built nằm trong folder target.
 	* dùng các công cụ để đưa file này lên server như FileZilla, ..., hoặc có thể dùng câu lệnh để chuyển file qua internet.
 	* chạy file jar này, chú ý thêm '&' vào sau câu lệnh để chương trình được chạy ngầm và không bị tắt.
@@ -33,13 +36,21 @@
 
 * các bước để deploy reactjs lên web server và cài đặt reverse proxy.
 	* ở đây chọn Nginx làm webserver và reverse proxy
+	* cài Nginx
+	* chạy dự án reactjs, copy tất cả các file đã được lưu lên server.
+		'npm run build'
+	* cấu hình nginx nhận domain của bạn, nhận cổng, khi truy cập vào domain sẽ thấy nginx đang chạy.
+	* đưa các file trong folder build vào thư mục etc/var/www/nginx/html/
+	* cấu hình nginx vào file index.html của dự án
+	* cấu hình nginx chuyển hướng với các request đến backend.
+	* phần này còn khá sơ sài, cập nhật sau.
 	
-	
-
 * các bước để sử dụng cloud service: (các cloud services đều có mô típ kết nối và sử dụng giống nhau, nên chỉ cần nắm bắt
 	một số service thì có thể tự tìm hiểu)
 	* RDS
-	
+		* RDS là database hosting của aws, kết nối khá đơn giản, chỉ cần lấy connectString, user, password trên hệ thống
+		là đăng nhập vào sử dụng.
 	* S3 Bucket
+		* S3 Bucket hỗ trợ lưu data theo file, tệp, giống như ổ cứng bình thường.
 
 	
