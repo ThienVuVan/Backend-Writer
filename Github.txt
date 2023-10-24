@@ -37,6 +37,13 @@
 * git add . // đưa file cho git quản lý.
 * khi merge nhánh master vào nhánh con, đôi khi git sẽ bắt commit, bạn chỉ cần commit và sau đó merge, điều này chỉ để
 	làm rõ lịch sử commit.
+
+* Tại sao bạn đã thêm file vào để git quản lý, mà khi thay đổi nội dung file, git vẫn bắt bạn add lại mà không được commit
+	luôn.
+	* nguyên nhân là do git muốn làm rõ bạn muốn đưa những thay đổi nào vào staging area để chuẩn bị cho commit.
+	* git vẫn quản lý, nhưng git muốn làm rõ muốn thay đổi những gì, nếu là untrack file là git chưa quản lý.
+	* ví dụ nếu bạn có ba file thay đổi, nhưng chỉ muốn commit 1 file, đó, bạn phải nhắc git bạn muốn thay đổi commit thay 
+		đổi nào, lúc này git add . là như vậy đó, chứ ko phải là git không quản lý file đó.
 	
 * Làm việc với SSH trong git *
 SSH key
@@ -107,6 +114,7 @@ IV.	Cấu hình git
 	git config --global user.name "Tên của bạn"
 	git config --global user.email "Email của bạn"
 	git config –list : Kiểm tra lại config xem đã đúng chưa
+* bạn cấu hình name là đủ.
 
 V.	Repository
 •	Repository là gì: Là kho lưu trữ dữ liệu của 1 dự án

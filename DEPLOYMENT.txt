@@ -1,0 +1,45 @@
+* Deployment *
+
+* Bàn luận về các môi trường cần thiết để chạy java.
+
+* Các bước để cài đặt server để deploy: (ở đây chọn EC2 của AWS)
+	* đăng kí một server linux, ubuntu ...
+	* connect vào server trên trang chủ thuê service.
+	* đổi password root.
+	* ssh vào server ...
+	* thêm user.
+	* thêm user vào nhóm sudo.
+	* cấu hình bật đăng nhập bằng password.
+	* từ lần sau ssh bằng tên user, ip và password.
+	* ip của server phải được bảo mật, để tránh các cuộc tấn công như DOS, DDOS. lộ ip rất có thể sẽ phải đổi server.
+		phần này sẽ được hướng dẫn ở phần sau.
+		
+* các bước để deploy springboot lên server.
+	* chạy câu lệnh build chương trình.
+	* vào lấy file jar đã được built nằm trong folder target.
+	* dùng các công cụ để đưa file này lên server như FileZilla, ..., hoặc có thể dùng câu lệnh để chuyển file qua internet.
+	* chạy file jar này, chú ý thêm '&' vào sau câu lệnh để chương trình được chạy ngầm và không bị tắt.
+	* như trên máy local, ứng dụng cũng sẽ được chạy và được truy cập vào trên cổng chỉ định.
+	* lưu ý, với cách này phải cài jdk vào server.
+	
+* các bước để deploy với docker.
+	* ở bước trên phải cài jdk, nhưng với docker thì không cần.
+	* có nhiều cách để dùng docker.
+	* cách 1: tải file jar lên server bình thường, viết docker file để tạo ra một custom image, và chạy container, trong
+		dockẻ file cần chọn server có môi trường jdk hợp lý.
+	* cách 2: build sẵn image ở local, push lên dockerHub, vào server pull về và chạy.
+	* lưu ý: khi viết docker file, container khi chạy là một server riêng biệt, một máy ảo sử dụng công nghệ ảo hóa, chia sẻ
+		các tiến trình với server thật, lên phải mapping port trong container với server ngoài.
+
+* các bước để deploy reactjs lên web server và cài đặt reverse proxy.
+	* ở đây chọn Nginx làm webserver và reverse proxy
+	
+	
+
+* các bước để sử dụng cloud service: (các cloud services đều có mô típ kết nối và sử dụng giống nhau, nên chỉ cần nắm bắt
+	một số service thì có thể tự tìm hiểu)
+	* RDS
+	
+	* S3 Bucket
+
+	

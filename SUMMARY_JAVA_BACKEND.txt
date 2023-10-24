@@ -853,8 +853,33 @@ cấu trúc thì xem trong  slide.
 		để tìm view vật lý và bind model vào đó, và trả về một trang html mới.
 	* nhưng với rest api, controller lại trả về một http response, chứ không phải là một view, và dữ liệu trả về thường
 		là json. bên frontend có trách nhiệm nhận và xử lý data.
+		* spring-boot cũng được xây dựng trên jackson-bind, jackson-bind là thư viện dùng để bind các java object thành 
+			json và ngược lại.
 	* đó là sự khác biệt, chỉ là cắt gọn đi đoạn sau.
 	* khi spring boot chạy, các bạn sẽ thấy dispatcherservlet đc tự động khởi động.
+
+* REST (REpresenttational State Transfer) lần đầu tiên được giới thiệu vào năm 2000 trong luận văn tiến sĩ của Roy Thomas
+	 Fielding (đồng sáng lập giao thức HTTP). Trong luận văn ông giới thiệu khá chi tiết về các ràng buộc, quy ước cũng như
+	 cách thức thực hiện với hệ thống để có được một hệ thống REST. Hiểu một cách đơn giản, REST là một hệ thống các ràng buộc
+	 (constraints), chỉ cần đảm bảo những điều đó hệ thống của bạn có thể được gọi là RESTfull.
+
+* RESTful (REpresentational State Transfer) là một kiểu Web Service được viết dựa trên kiến trúc REST.
+	Các đặc điểm của RESTful web service:
+	Sử dụng các phương thức HTTP/HTTPs
+	Phi trạng thái (stateless) (không lưu trữ thông tin của client)
+	Hiển thị cấu trúc thư mục như các Urls
+	Truyền tải dữ liệu với định dạng phong phú: html, json, text, xml… (thường sử dụng nhiều với json)
+
+* Dữ liệu và các tính năng được coi như tài nguyên và được truy suất thông qua các URI (Uniform Resource Identifier)
+	REST sử dụng 4 phương thức chính của HTTP là POST, GET, PUT và DELETE để thực hiện các hành động CRUD đối với các tài nguyên
+	Restfull API là một tiêu chuẩn dùng trong việc thiết kế các thiết kế API. Các web service thường được áp dụng các cấu trúc
+	REST vào để xây dựng
+	Các cấu trúc cơ bản của cấu trúc REST:
+	Sử dụng các phương thức HTTP một cách rõ ràng
+	Phi trạng thái
+	Hiển thị cấu trúc thư mục như các URLs
+	Truyền tải JavaScript Object Notation(JSON), XML hoặc cả hai
+
 	
 --------------------------------------------- SPRING DATA JPA -----------------------------------------------------
 * bây giờ chúng ta sẽ học một thư viện mới của spring framwork, kết nối với cơ sở dữ liệu cực gi dễ dàng.
@@ -984,6 +1009,15 @@ cấu trúc thì xem trong  slide.
 	
 	// Chi tiết xem luồng đi của spring security, tìm file JWT_SECURITY để đọc.
 	// xem code trong project.
+	
+* Bàn luận về JDBC template.
+	* đối với spring data jpa, truy xuất dữ liệu chỉ trả về một object hoặc một list các object.
+	* đối với Session và Entity Manager, dữ liệu trả về có thể là object, list các object, hoặc một single value.
+	* nhưng khi muốn truy vẫn phức tạp hơn, ví dụ khi thông tin của mình cần join rất nhiều bảng, và chỉ lấy vài cột cần
+	thiết, sdj, session, entitymanager thì không làm được việc này, nên jdbc template sẽ giải quyết được nhờ đối tượng 
+	rowmapper, đối tượng này sẽ lấy kết quả từ resultset và mapping vào một map.
+
+
 	
 	
 

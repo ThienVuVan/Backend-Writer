@@ -339,14 +339,15 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 * Bàn về apache tomcat:
 	* apache tomcat là một phiên bản lightweight của apache, nó là một máy chủ web, hỗ trợ jsp/serverlet.
 	* vậy máy chủ web là gì:
-		* khi bạn chạy một chương trình Backend, ct đó chỉ chạy trên local, và chương trình đó sẽ không biết nhận tín hiệu
-		gọi đến kiểu gì, và nhận từ ai.
-		* và máy chủ web sẽ giải quyết vấn đề này, nó là một proxy, tức là đứng ra nhận request, gửi đến chường trình để sử
-		lý. Ví dụ khi deployment ứng dụng, ta có Nginx là một web server, là reverse proxy, đứng ra để bắt tất cả các request
-		gửi đến cổng được chỉ định bắt và gửi đến cổng mà ứng dụng đang chạy, và cũng hỗ trợ deploy frontend như như js, html ...
-		* trong spring framework, ta hay sử dụng apache tomcat làm máy chủ web, đứng ra nhận các request ở cổng chỉ định và
-		đưa vào ứng dụng, trong mô hình mvc, apache tomcat hỗ trợ build frontend như jsp, themleaf ..., và hỗ trợ serverlet.	
-		* cho nên không có máy chủ web ứng dụng vẫn chạy nhưng không có ai nói cho ứng dụng phải làm việc gì cả.
+		* với nhưng chương trình bình thường, khi run chương trình, chỉ cần jdk là đủ. Nhưng với spring framework, chúng
+		ta đang xây dựng một ứng dụng có thể nhận các httprequest và trả httpResponse và chạy được nên phải có một web server
+		đứng ra	làm điều này.
+		* và trong spring apachetomcat đứng ra làm điều này, apache tomcat cũng hỗ trợ built jsp/servelet động, và nó không
+			phải là một reverse proxy.
+		
+		* Trong framework, khi chạy chương trình ta phải tự import tomcat, và khi chạy ide sẽ bắt chúng ta chọn máy chủ web
+		để built.
+		* trong spring boot, thì chúng ta đã được tích hợp sẵn máy chủ tomcat để built.
 
 * Bàn về access modifier trong java.
 	* Trong java có nhiều loại access modifier: public, private, protected, default, static, abstract ...
@@ -370,4 +371,12 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 	* properties và methods có các access modifier là public, private, protected, default, static, abstract;
 	
 	* Constructor có các access modifier là public, private, protected, default;
+
+* Bàn về đa kế thừa trong java.
+	* trong java không hỗ trợ đa kế thừa, chỉ hỗ trợ đa triển khai các interface.
+	* nhưng java hỗ trợ kế thừa đa cấp, nghĩa là c kế thừa b, b kế thừa a.
+	* một số điểm lưu ý sau:
+		* trong class con, khi gọi super.method() hay super.properties, nó sẽ gọi đến lớp cha kế thừa gần nhất.
+		* muồn họi đến super.super, thì có giải pháp khác là trong class con, tạo một đối tượng class supper.super
+		và mỗi lần cần gọi đến method của class super.super, ta chỉ cần gọi đến object super.super đã được khai báo.
 	
