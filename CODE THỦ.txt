@@ -48,6 +48,8 @@ của lớp cha. nếu bạn muốn gọi một constructor chứa tham số c�
 Ví dụ 'super(name, age);' nhớ là phải luôn đặt ở đầu constructor con, nếu không java sẽ báo lỗi. ghi nhớ là bạn chỉ có thể gọi
 constructor cha trong constructor con, bạn không thể gọi bên ngoài constructor con được.
 Bạn cũng có thể gọi các properties và method của lớp cha thông qua super, ví dụ 'super.printer()'.
+	* Lưu ý: khi bạn kế thừa đa cấp, c extend b, b extend a, khi bạn gọi super trong c thì sẽ gọi đến lớp cha kế thừa
+		gần nhất, và ở đây là gọi đến lớp b.
 
 * Nói thêm về interface, mọi properties trong interface đều là public, static, final. mọi method trong interface đều là public
 abstract. nhưng trong java8, một method mới được bổ sung vào interface là default method, defaul method là method đã triển khai.
@@ -121,7 +123,7 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 	* Nhưng autoboxing không hoàn toàn thay thế cho boxing, ví dụ Boolean = true -> đúng; Boolean = 'true' -> sai;
 		Boolean = Boolean.valueOf('true') -> đúng; đây là thế mạnh của boxing.
 	* Và tất nhiên cũng có unboxing và auto unboxing;
-		* int x = Diem.intVlaue(); -> unboxing
+		* int x = Diem.intVlaue(); -> unboxing;
 		* int x = Diem -> auto unboxing;
 	
 	* Một điều phải biết nếu muốn trở thành pro developer

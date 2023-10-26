@@ -87,6 +87,16 @@ SSH key
 	* Now when you push or actions, your local git repo will send via private key, github will compare public key via private
 		key, if success, you can work via remote repository.
 	
+* Cách sửa conflict
+	* khi merge nhánh này vào nhánh kia, nếu sảy ra conlict, git sẽ đưa code conlict vào nhánh head/MERGING
+	* head là nhánh được mege.
+	* vi vào file conflict, sẽ thấy phần trên head là code của head, code ở dưới là code của nhánh bị merge.
+	* việc của bạn là kết hợp hai đoạn code conflict này vào nhau, rồi xóa bỏ các kí tự phân chia conflict ban đầu và add
+	commit lại, và git sẽ merge được.
+	* khi ở nhánh head/MEGRING, nếu không dùng được command line để sửa conflist như lệnh các thao tác với lệnh vi
+		thì nếu ide của bạn hỗ trợ, thì bạn mở file conflict lên thì ide vẫn hiển thi chỗ lỗi với các ký tự nhận biết của git.
+		
+	
 	
 	
 ------------------------------------------------------ Phần Docs -----------------------------------------------------
