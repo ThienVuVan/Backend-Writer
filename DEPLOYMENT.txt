@@ -40,9 +40,12 @@
 	* chạy dự án reactjs, copy tất cả các file đã được lưu lên server.
 		'npm run build'
 	* cấu hình nginx nhận domain của bạn, nhận cổng, khi truy cập vào domain sẽ thấy nginx đang chạy.
+		* file config của nginx nằm ở etc/nginx/config.
 	* đưa các file trong folder build vào thư mục etc/var/www/nginx/html/
 	* cấu hình nginx vào file index.html của dự án
 	* cấu hình nginx chuyển hướng với các request đến backend.
+		* với các request có uri bắt đầu bằng 'api/' thì chuyển hướng đến cổng localhost:8080
+		* với các request với uri khác, thì làm tương tự.
 	* phần này còn khá sơ sài, cập nhật sau.
 	
 * các bước để sử dụng cloud service: (các cloud services đều có mô típ kết nối và sử dụng giống nhau, nên chỉ cần nắm bắt
@@ -52,5 +55,57 @@
 		là đăng nhập vào sử dụng.
 	* S3 Bucket
 		* S3 Bucket hỗ trợ lưu data theo file, tệp, giống như ổ cứng bình thường.
+
+* Apache và Apache tomcat. // update
+
+* OracleJDK và OpenJDK.
+	* ban đầu, chỉ có một mã bộ mã nguồn java duy nhất là jdk của sun microsystems, khi java được chuyển giao cho oracle
+		thì bộ mã nguồn java được đổi tên thành OracleJDK. được Oracle phát triển như một sản phẩm.
+	* Vì là Open Source, nên một cộng đồng đã đóng góp rất nhiều vào bộ mã nguồn java, và sinh ra một phiên bản có tên là
+		OpenJDK, OpenJDK cũng được được đội ngũ của oracle support phát triển, nhưng có một số tính năng của oraclejdk mà
+		openjdk không có, bản oraclejdk có đầy đủ liences nên có nhiều module được chấp nhận sử dụng trên nhiều môi trường
+		khác nhau, openjdk đôi khi không có điều này.
+	
+	* Một sự kiện lớn xẩy ra vào tháng 10 năm 2009, Oracle mua Sun Microsystem, như vậy Java đã chính thức thay đổi chủ sở hữu.
+		Hãy chú ý tới thời điểm trước và sau năm 2009.
+		
+	* Các phiên bản Java từ 1 đến 6 được phát triển bởi Sun Microsystem, họ mở mã nguồn của Java cho tất cả mọi người trên thế giới.
+		Tháng 7 năm 2011, Oracle phát hành Java 7, họ đã phát hành 2 biến thể khác nhau của JDK là Oracle JDK và OpenJDK,
+		thời điểm đó mã nguồn của 2 biến thể này không có quá nhiều sự khác biệt, bởi vì chúng đều được thừa kế từ JDK 6.
+
+	* OpenJDK được mở mã nguồn, nó được bảo trì và phát triển bởi Oracle, nhưng cho phép cộng đồng và các công ty khác tham
+		 gia vào sự phát triển này, chẳng hạn như Red Hat, Azul Systems, IBM, Apple Inc... OpenJDK vừa là một sản phẩm JDK
+		 vừa là một đặc tả (specification), bất kỳ một công ty, tổ chức nào muốn sử dụng OpenJDK để tạo ra một biến thể mới
+		 phải tuân thủ các đặc tả đó.
+	* OpenJDK được phát triển bởi Oracle và sự đóng góp từ cộng đồng, đôi khi chúng ta gặp vấn đề với sự ổn định, dựa trên
+		phản hồi của người dùng nó sẽ được nâng cấp để tốt hơn. OpenJDK được cập nhập thường xuyên, khoảng 6 tháng một lần.
+
+	* Oracle JDK được bảo trì và phát triển bởi Oracle, và tuân thủ các đặc tả của OpenJDK, nhưng nó không được mở mã nguồn.
+		Oracle JDK tốt hơn nhiều về khả năng đáp ứng và hiệu năng JVM. Nó tập trung nhiều hơn vào sự ổn định do tầm quan trọng
+		của nó đối với khách hàng doanh nghiệp của mình.
+		
+* Các bước để build một dự án spring boot.
+	* chuẩn bị Oracle JDK hoặc OpenJDK.
+	* sử dụng các ide hỗ trợ tạo spring boot hoặc sử dụng spring initialize.
+	* phân chia câu trúc thư mục dự án.
+	* liệt kê, tải các thư viện cần thiết.
+		* các thư viện của spring boot: springboot-starter, springboot data jpa, springboot security, springboot test,
+			springboot validation.
+		* các thư viện liên quan: database-connector, Log4j, Mapstruct, Swagger, spring boot devtools, lombok, jwt
+			oauth2(nếu triển khai).
+		* trong springboot data jpa có hibernate core, jdbc template ...
+		* trong springboot validation có hibernate validator.
+		* // còn nhiều tự vào thư viện tìm hiểu.
+	* code entity
+	* config file properties.
+	* chạy generate table trong database.
+	* config spring security.
+		* config CORS // accept all request from different domain or sepecific domain.
+		* // update.
+	* code and config jwt.
+	* triển khai luồng dữ liệu theo mô hình 3 lớp, repository, service, controller.
+	
+	
+	
 
 	

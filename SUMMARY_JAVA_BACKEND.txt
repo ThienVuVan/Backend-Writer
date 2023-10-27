@@ -731,7 +731,9 @@ The Spring Framework is a Java platform that provides comprehensive infrastructu
 		sau đó cập nhật view với dữ liệu mới.
 * Nói luôn về mô hình 3 lớp: cũng là một kiến trúc để phát triển ứng dụng để dễ dang quản lý, phân thành 3 tầng
 	Controller, Service, DataAccess.
-	* Controller: đại diện cho lớp điều khiển trong mô hình mvc, và làm việc với lớp service để thực hiện logic kinh doanh
+	* Controller: đại diện cho lớp điều khiển, và làm việc với lớp service để thực hiện logic kinh doanh.
+		Trong MVC thì trả về View.
+		Trong RestFul thì trả về http Response (ResponseEntity).
 	* Service layer: chứa logic của ứng dụng, nó thực hiện các chức năng cụ thể của ứng dụng, gửi và truy cập lớp dataaccess
 		cung cấp các dịch vụ cho controller.
 	* DataAccess layer: lớp này có nhiệm vụ tương tác với database hoặc bất kì nguồn dữ liệu nào khác, chịu trách nhiệm truyền
