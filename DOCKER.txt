@@ -81,6 +81,56 @@
 	* dockerfile chứa các bước hướng dẫn docker engine thực hiện để tạo image riêng.
 	* structure:
 		FROM alpine:lastest
-		RUN apk add bash
-		CMD ["bash"]
+		COPY . .
+		RUN apk add bash / form excute or shell excute.
+		CMD ["bash"] / form excute or shell excute.
+		ENTRYPOINT / form excute or shell excute.
+	
+	* Detail:
+		* FROM: là câu lệnh để chọn môi trường cho một image, thường là một linux distribution để có tích hợp môi trường
+			phù hợp với dự án, như alpine, debain ..., có tích hợp các công cụ cho project như nodejs, jdk, asp.net.
+			* ví dụ:
+				FROM alpine:3.4 // trong os alpine:3.4 có bộ công cụ jdk để chạy chương trình java.
+		
+		* COPY: câu lệnh copy được dừng để copy source code vào container.
+			* ví dụ: COPY . . // copy tất cả code trong dự án tính từ ngang cấp với file dockerfile.
+					 COPY /user /myfile // copy tất cả các file trong folder user vào folder myfile trong container.
+					 * chú ý: câu lệnh trên không hề đưa foleder user vào myfile, nó chỉ copy nội dung của folder user.
+							  và nếu trong container chưa có folder myfile, docker sẽ tự tạo để chuyển vào, thông thường
+							  source code sẽ được đưa vào folder myfile trong container.
+			* với lệnh COPY: sẽ chỉ copy được các file ngang cấp với file dockerfile trở xuống, vì thế sẽ không copy được
+							 với các file nằm ngoài folder dự án và nằm trên dockerfile.
+	
+		* RUN: sau có thể là một form excute hoặc shell excute
+			* form excute có dạng: ["run","parameter", ...]
+			* ví dụ: RUN ["apt-get", "update"] // update linux os distribution.
+			* shell excute có dạng: run parameter // như một câu lệnh terminal bình thường.
+			* ví dụ: apt-get upgrade
+			* Câu lệnh RUN chạy xong xong khi khởi tạo container, nó thường được sử dụng để làm những câu lệnh có liên quan 
+				đến môi trường của container.
+			* câu lệnh run không bị ghi đè khi có lệnh shell bên ngoài truyền vào.
+		
+		* CMD: câu kệnh cmd cũng dùng để chạy các dòng lệnh, nhưng khác với RUN là nó chạy sau khi container đã được khởi tạo.
+			   còn RUN chạy xong xong khi container được khởi tạo.
+				* câu lệnh CMD thường được sử dụng để khởi chạy các chương trình từ source code.
+				* câu lệnh CMD cũng có thể dùng dạng form excute và shell excute
+				* ví dụ: CMD java -jar <filebuild> & // câu lệnh dùng để chạy chương trình java dưới nền.
+				* lưu ý:  trong dockerfile, nếu có nhiều câu lệnh CMD thì docker luôn chọn câu lệnh CMD cuối cùng để chạy,
+					và khi khởi tạo container, nếu bạn truyền một shell CMD vào thì câu lệnh CMD cuối cùng trong dockerfile
+					sẽ bị ghi đè. để không bị ghi đè ta có thể dùng ENTRYPOINT.
+		
+		* ENTRYPOINT: giống với câu lệnh CMD, nhưng khác với CMD là nó sẽ không bị ghi đè khi có một shell CMD truyền vào
+			khi khởi tạo container. và CMD lại là một parameter mặc định cho ENTRYPOINT.
+				* ví dụ: ENTRYPOINT ["java", "-jar"]
+						 CMD ["~/bookstore.jar", "&"]
+						 // hai câu lệnh trên sẽ được ghép thành java -jar ~/bookstore.jar &
+		
+		* ví dụ một docker file để chạy dự án springboot:
+			FROM alpine:3.4
+			COPY /targer/bookstore.jar /myfile
+			RUN apt-get update
+			CMD java -jar /myfile/bookstore.jar &
+		
+		// Lưu ý, khi khởi chạy container nhớ port mapping ra máy local, nếu không không kết nối được với chương trình.
+		
 	
