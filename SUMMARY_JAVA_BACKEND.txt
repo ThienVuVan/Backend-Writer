@@ -1018,6 +1018,74 @@ cấu trúc thì xem trong  slide.
 	* nhưng khi muốn truy vẫn phức tạp hơn, ví dụ khi thông tin của mình cần join rất nhiều bảng, và chỉ lấy vài cột cần
 	thiết, sdj, session, entitymanager thì không làm được việc này, nên jdbc template sẽ giải quyết được nhờ đối tượng 
 	rowmapper, đối tượng này sẽ lấy kết quả từ resultset và mapping vào một map.
+	
+	
+* Hibernate yêu cầu một constructor không tham số (default constructor) cho một số lý do kỹ thuật và thiết kế.
+	Dưới đây là một số lý do tại sao Hibernate yêu cầu default constructor:
+
+	* Quy tắc JavaBeans: Hibernate tuân theo quy tắc của JavaBeans, và một trong những quy tắc cơ bản của JavaBeans là phải
+	có một constructor không tham số. JavaBeans là một mô hình lập trình cho các đối tượng Java, và nó định rõ một số yêu cầu
+	về cách các đối tượng được tạo và quản lý.
+
+	* Tạo đối tượng: Hibernate cần khởi tạo đối tượng của các lớp được ánh xạ từ cơ sở dữ liệu. Để làm điều này, nó sử dụng
+	constructor không tham số để tạo một phiên bản của đối tượng. Nếu không có constructor này, Hibernate sẽ không thể tạo
+	đối tượng và thực hiện ánh xạ dữ liệu từ cơ sở dữ liệu vào đối tượng.
+
+	* Đối tượng trạng thái: Hibernate thường tạo mới đối tượng để thực hiện các thao tác CRUD (Create, Read, Update, Delete)
+	trên cơ sở dữ liệu. Constructor không tham số cho phép Hibernate tạo đối tượng trong trạng thái ban đầu, sau đó thay đổi
+	trạng thái của đối tượng để phản ánh dữ liệu từ cơ sở dữ liệu hoặc thay đổi trạng thái để lưu dữ liệu mới vào cơ sở dữ
+	liệu.
+
+	* Thiết kế đối tượng: Một constructor không tham số cho phép bạn đảm bảo rằng đối tượng được tạo với trạng thái ban đầu 
+	hợp lệ. Điều này đặc biệt hữu ích khi bạn cần thực hiện kiểm tra và khởi tạo trạng thái ban đầu của đối tượng trước khi
+	sử dụng nó.
+
+	* Tóm lại, constructor không tham số là một yêu cầu của Hibernate để đảm bảo quá trình ánh xạ dữ liệu giữa cơ sở dữ liệu
+	và đối tượng Java diễn ra một cách đúng đắn và hiệu quả.
+
+* Một ví dụ về conflict trong hibernate 
+	; // transient object
+	Role role = roleRepository.findById(1); // detached object
+	user.setRole(role);
+	userRepository.save(user); // transfer transient to persistence.
+	// error: detached entity passed to persist, InvalidDataAccessApiUsageException, detached entity passed to persist
+	* giải thích:
+		* một object ở trạng thái detached không thể đưa về trạng thái transient, vì thể ở đoạn code trên, ta đang đưa một
+			detached gán vào transient, nghĩa là ta đang đưa detach về transient. nên khi gán như vậy, role vẫn đang ở trạng
+			thái detached, khUser user = new User('thien', 20)i userRepository.save(user) thì đang lưu một detached object vào data, điều này gây lỗi vì
+			hibernate chỉ có thể lưu và làm việc với các persistent object.
+	* giải pháp:
+		User user =userRepository.save(new User('thien', 20));
+		* đưa user vào trạng thái persistence trước khi gán role, điều này làm role được đưa về trạng thai persistence,
+		đúng flow của hibernate state. và hibernate sẽ làm viêc đúng.
+	* giải pháp khác là đưa role vào persistence bằng các hàm của hibernate.
+		* giải pháp này phải dùng hibernate thuần, mở session và thực hiện mọi thao tác trong một session,
+		không dùng được không spring data jpa
+		* chưa biết spring data jpa hỗ trợ đưa object trở lại persistence kiểu gì.
+
+* nói một chút về flow và cycle của các object khi làm việc với hibernate.
+	* transient -> persistence -> detached.
+	* từ transient không thể sang detached trực tiếp và phải qua persistence.
+	* từ persistence sang detached khi session đóng hoặc đưa các persistence object ra khỏi session.
+	* từ persistence không thể về transient.
+	* từ detached có thể về persistence bằng các hàm hỗ trợ nhưng không thể về transient.
+	* các transient object khi không còn được sử dụng thì java sé có cơ chế java garbage để giải phóng các object này 
+		để tiết kiệm bộ nhớ.
+
+* bàn về transactional trong spring data jpa.
+	* đối với các hàm mặc định của datajpa, tất cả các hàm đã được bọc trong @Transactional.
+	* khi cần làm việc với database mà không thông qua các hàm của jpa và bằng native query, bắt buộc phải mở transactional,
+		vì spring data jpa sẽ không gọi hibernate để quản lý transaction đối với các loại làm việc với database này.
+
+* Trong cơ chế IOC, việc java tự tạo các javaBeans bằng cách gọi đến default constructor của bean đó, vì thế, khi triển
+	khai bất kỳ bean vào, phải có default constructor.
+	
+	
+	
+		
+	
+	
+	
 
 
 	

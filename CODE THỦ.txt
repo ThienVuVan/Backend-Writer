@@ -9,6 +9,7 @@
 	* JDK (java development kit) chứa JRE, và bổ sung thêm các bộ công cụ để phát triển ứng dụng java, bao gồm trình biên dịch
 	để chuyển mã nguồn thành bytecode, các thư viện để phát triển giao diện người dùng, debugger.
 	* nếu chỉ muốn chạy một chương trình java, JRE là đủ, nhưng nếu muốn phát triển và triển khai ứng dụng java, bạn cần JDK
+	* JDB (java debugger ), trình debugger trong bộ jdk.
 	
 	* JVM, JRE và JDK là ba khái niệm quan trọng trong ngôn ngữ lập trình Java mà bất kỳ lập trình viên nào cũng cần biết.
 	JVM (Java Virtual Machine) là một máy ảo, chịu trách nhiệm chuyển đổi bytecode (được biên dịch từ mã nguồn Java) thành
@@ -381,4 +382,7 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 		* trong class con, khi gọi super.method() hay super.properties, nó sẽ gọi đến lớp cha kế thừa gần nhất.
 		* muồn họi đến super.super, thì có giải pháp khác là trong class con, tạo một đối tượng class supper.super
 		và mỗi lần cần gọi đến method của class super.super, ta chỉ cần gọi đến object super.super đã được khai báo.
-	
+
+
+
+
