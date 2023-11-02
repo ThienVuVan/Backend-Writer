@@ -1080,9 +1080,35 @@ cấu trúc thì xem trong  slide.
 * Trong cơ chế IOC, việc java tự tạo các javaBeans bằng cách gọi đến default constructor của bean đó, vì thế, khi triển
 	khai bất kỳ bean vào, phải có default constructor.
 	
+
+* Khi tạo dự án với spring security, thì spring sẽ tự dùng phương thức basic authentication để bảo vệ api
+	và spring sẽ sử dụng tên đăng nhập là 'user' và password tự gen, có thể thấy ở trong log của spring.
+	* khi dùng postmant đẻ gọi, bạn phải chọn basic authen để nhập user và password, thông tin này sẽ được mã hóa
+		base64 và gửi đi trong header với tiêu đề là Authorization.
+	* khi dùng các trình duyệt, spring sẽ tự động gửi ra một trình duyệt đẻ bạn nhập user và password, và spring sẽ dùng
+	form mặc định và AuthenticationEntryPoint để check credential, nếu implement lại springSecurity thì form sẽ mất nhưng
+	AuthenticationEntryPoint vẫn hoạt đông, và bắt có user và passowrd, thế nên bạn phải triển khai lại luôn
+	AuthenticationEntryPoint để spring security hoạt động đúng với cách chúng ta mong muốn.
 	
+	* khi làm việc với spring security, bạn sẽ thấy không gửi được request với method post, vì đó là cơ chế bảo vệ api
+	của spring security, bạn cần gửi kèm sessionId lần request trước mới có thể request với method post lần này.
+	* cơ chế này gọi là CORS, yêu cầu với method POST, DELETE, UPDATE,... các phương thức có liên quan đến database
+	thì phải gửi sessionId lần request trước mới có thể chấp nhận được.
 	
-		
+	* như đã biết có hai loại exception, check và uncheck, trong ControllerAdvice, nếu implement cả hai thì exception nào
+	sẽ chạy vào đúng hanlder đó, nếu chỉ triển khai một cái thì controllerAdvice và chạy vào bất kỳ dù là Exception hay là
+	RuntimeException.
+	* nếu muốn bắt exception cụ thể hơn, chỉ cần truyền vào @ExceptionHandler loại exception cần bắt.
+	* lưu ý: ControllerAdvice chỉ bắt các exception xảy ra trên tậng controller, còn tất cả các exception ở tần khác
+	nếu xảy ra sẽ gây ra gián đoạn chương trình và lỗi server.
+	* lưu ý: đối với lỗi xảy ra ở tầng controller, hãy bắt lỗi và trả về lỗi, không nên tự ý kiểm soát và biến hóa lỗi,
+	có thể dẫn đến sai lệch dữ liệu.
+	
+* lưu ý đối với version của jdk khi sử dụng spring boot, từ springboot3. thì chỉ sử dụng được cho phiên bản jdk 17 trở lên,
+có thể dùng oracleJdk hoặc openJdk.
+* các class dto là các class thay thế cho bean, đại diện cho dữ liệu được đi ra ngoài, thế nên dữ liệu của Dto không nhất
+thiết phải giống các java beans, nó có thể là dữ liệu của các javabeans hợp lại, nó làm cho tránh việc truyền tải cả một
+javabeans ra ngoài, đôi khi gây đến nhiều lỗi không mong muốn và lộ dữ liệu.
 	
 	
 	
