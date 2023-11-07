@@ -1,52 +1,175 @@
-* Deployment *
 
-* Bàn luận về các môi trường cần thiết để chạy java.
+* CÁC BƯỚC HOÀN CHỈNH ĐỂ DEPLOY MỘT DỰ ÁN WEB CƠ BẢN SỬ DỤNG CÔNG NGHỆ SPRINGBOOT VÀ REACTJS.
 
-* Các bước để cài đặt server để deploy: (ở đây chọn EC2 của AWS)
-	* đăng kí một server linux, ubuntu ...
-	* connect vào server trên trang chủ thuê service.
-	* đổi password root.
-	* ssh vào server ...
-	* thêm user.
-	* thêm user vào nhóm sudo.
-	* cấu hình bật đăng nhập bằng password.
-	* từ lần sau ssh bằng tên user, ip và password.
-	* ip của server phải được bảo mật, để tránh các cuộc tấn công như DOS, DDOS. lộ ip rất có thể sẽ phải đổi server.
-		phần này sẽ được hướng dẫn ở phần sau.
-	
-	// các bước chi tiết và câu lệnh sẽ được diễn giải chi tiết sau.
-		
-* các bước để deploy springboot lên server.
-	* chạy câu lệnh build chương trình.
-		'mvn clean package'
-	* vào lấy file jar đã được built nằm trong folder target.
-	* dùng các công cụ để đưa file này lên server như FileZilla, ..., hoặc có thể dùng câu lệnh để chuyển file qua internet.
-	* chạy file jar này, chú ý thêm '&' vào sau câu lệnh để chương trình được chạy ngầm và không bị tắt.
-	* như trên máy local, ứng dụng cũng sẽ được chạy và được truy cập vào trên cổng chỉ định.
-	* lưu ý, với cách này phải cài jdk vào server.
-	
-* các bước để deploy với docker.
-	* ở bước trên phải cài jdk, nhưng với docker thì không cần.
-	* có nhiều cách để dùng docker.
-	* cách 1: tải file jar lên server bình thường, viết docker file để tạo ra một custom image, và chạy container, trong
-		dockẻ file cần chọn server có môi trường jdk hợp lý.
-	* cách 2: build sẵn image ở local, push lên dockerHub, vào server pull về và chạy.
-	* lưu ý: khi viết docker file, container khi chạy là một server riêng biệt, một máy ảo sử dụng công nghệ ảo hóa, chia sẻ
-		các tiến trình với server thật, lên phải mapping port trong container với server ngoài.
+	* Bước 1: Mua một tên miền.
+	* Bước 2: Chuẩn bị server (ec2 của aws, vm của azure, ...).
+	* Bước 3: Cài đặt DNS cho tên miền (lấy public ipv4 của server gắn cho tên miền).
+	* Bước 4: Chuẩn bị Database Hosting (RDS của aws, SQL của google cloud, ...).
+	* Bước 5: Chuẩn bị Bucket để lưu các data ngoài Database như image, file, ... (S3 bucket của aws, R2 của google cloud, ...).
+	* Bước 6: Nếu Database Hosting hoặc Bucket yêu cầu chỉ cho ip nào truy cập vào để sử dụng, nhớ mở lên và cài đặt lại.
+	* Bước 7: Build backend và frontend, cần chú ý các chi tiết sau:
+		* Đối với backend:
+			* Chỉnh sửa liên kết đúng với database hosting.
+			* Chỉnh sửa liên kết đúng với bucket hosting.
+			* build project bằng câu lệnh: mvn clean package -> một file jar sẽ được tạo ra trong folder targer.
+			  file này được build ra để chạy dự án của springboot.
+		* Đối với frontend:
+			* chỉnh sửa gọi api đúng với public ipv4 của server, không còn là localhost.
+			* build project bằng câu lệnh npm build -> tất cả các file cần thiết để chạy dự án được build ra trong
+			  folder build.
+	* Bước 8: Cấu hình server
+		* truy cập vào server lần đầu bằng cặp public và private key
+			ssh -i <name>.pem <user>@<ipv4>
+		* đổi mật khẩu root:
+			* passwd root -> change password root (keep password security).
+		* tạo user mới để sử dụng: 
+			adduser <name>
+			// các bước sau làm theo flow của server.
+		* cấp quyền sudo cho user mới tạo.
+			* sau này khi làm việc với sudo privilage, ta không sử dụng root, nếu bị lộ root password, hệ thống dễ bị xâm nhập
+			  nên cần cấp quyền sudo cho user và sử dụng user đó để làm việc với server.
+		* cấu hình mở truy cập vào server với authentication password.
+			* vi /etc/ssh/sshd_config
+			* thay đổi dòng: passwordauthentication no -> passwordauthentication yes;
+			* exit và reboot lại server: reboot.
+			* lưu ý: nếu vẫn không authen password được, truy cập vào cloud, reset lại password.
+			* khi đã authen được password, login lại bằng password với user mới tạo: ssh <name>@<ipv4>.
+		* Cài đặt jdk cho server.
+			* apt-get update: tải cập nhập mới nhất về server.
+			* apt-get upgrade: cập nhật mới nhất đã tải.
+			* apt install openjdk-17-jdk openjdk-17-jre // cài jdk.
+			* java --version // check java version -> ok.
+		* cài đặt nginx (web server deploy reactjs, reverse proxy bắt request cho backend).
+			* sudo apt update
+			* sudo apt install nginx
+			* systemctl status nginx // check status nginx.
+			* now you can check your nginx server: http://<your server ip> -> nginx will return default html.
+			* futher command line using when config nginx:
+				* sudo systemctl stop nginx
+				* sudo systemctl start 
+				* sudo systemctl restart nginx
+				* sudo systemctl enable nginx
+	* Bước 9: tải mã nguồn lên server.
+		* Công cụ sử dụng: FileZilla
+			* Mở FileZilla lên, nhập ip server, usename, password, port(22) rồi kết nối với server.
+		* Đối với backend:
+			* đối với file chạy backend: tải vào thư mục /home/<current_user>/
+			* lưu ý: trong quá trình tải, nếu lỗi có thể do destination không thuộc về user đang tạo hoặc không có quyên ghi,
+				cần đăng nhập bằng root để có toàn quyền hoặc truy cập vào server để thay đổi chế độ trên destination.
+		* Đối với frontend:
+			* vào /var/www/
+			* tạo thư mục mới, thư mục đại diện cho project của bạn.
+			* ví dụ: /var/www/bookstore.
+			* tạo thư mục html tiếp trong thư mục project
+			* ví dụ: /var/www/bookstore/htlm
+			* tải tất cả trong thư mục build trên local vào trong thư mục html.
+	* Bước 10: cấu hình nginx server.
+		* vào file /etc/nginx/nginx.conf bạn sẽ thấy hai dòng sau:
+			* include /etc/nginx/conf.d/*.conf;
+			* include /etc/nginx/sites-enabled/*;
+			* // hai dòng trê nghĩa là mọi file trong folder sites-enabled sẽ được đọc và build.
+		* tạo file và cách câu hình cho frontend và backend.
+			* vào thư mục /etc/nginx/sites-available
+			* tạo một file đại diện cho một config của project.
+			* ví dụ: /etc/nginx/sites-available/bookstore.
+			// bạn có thể thấy file default trong thư mục này, đó là file default config khi bạn gọi đến server bằng giao thức
+				http (port 80) và nginx trả về một trang html mặc định.
+			* trong file config của dự án của bạn, bạn cấu hình theo cấu trúc như sau:
+				server {
+				       listen 80; // lắng nghe tín hiệu cổng 80 (http)
+				       listen [::]:80;
+				
+				       server_name example.com; // cấu hình nhận server_name gọi đến.
+				
+				       root /var/www/example.com; // thư mục làm việc của nginx - frontend.
+				       index index.html; // thư mục khởi động của nginx.
+						
+					   
+				      location / { // cấu hình chuyển hướng đến backend bằng các nhận diện api gọi đến.
+				               try_files $uri $uri/ =404;
+				       }
+				}
+			* trên đây chỉ là một cấu trúc chung, một dự án sẽ deploy như sau:
+				server {
+				   listen 80;
+				   listen [::]:80;
 
-* các bước để deploy reactjs lên web server và cài đặt reverse proxy.
-	* ở đây chọn Nginx làm webserver và reverse proxy
-	* cài Nginx
-	* chạy dự án reactjs, copy tất cả các file đã được lưu lên server.
-		'npm run build'
-	* cấu hình nginx nhận domain của bạn, nhận cổng, khi truy cập vào domain sẽ thấy nginx đang chạy.
-		* file config của nginx nằm ở etc/nginx/config.
-	* đưa các file trong folder build vào thư mục etc/var/www/nginx/html/
-	* cấu hình nginx vào file index.html của dự án
-	* cấu hình nginx chuyển hướng với các request đến backend.
-		* với các request có uri bắt đầu bằng 'api/' thì chuyển hướng đến cổng localhost:8080
-		* với các request với uri khác, thì làm tương tự.
-	* phần này còn khá sơ sài, cập nhật sau.
+				   root /var/www/bookstore/html;
+				   index index.html index.htm index.nginx-debian.html;
+
+				   server_name bookstore.io.vn;
+
+				   access_log /var/log/nginx/bookstore_access.log; // config file access log của nginx được lưu ở đây.
+				   error_log  /var/log/nginx/bookstore_error.log; // config file error log của nginx được lưu ở đây.
+
+				   location / {
+							try_files $uri /index.html;
+				   }
+
+				   location /api { // đối với request gọi đến mà bắt đầu bằng /api thì chuyển hướng sang cổng 8080 đang chạy backend.
+							proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+							proxy_set_header X-Forwarded-Proto $scheme;
+							proxy_set_header X-Real-IP $remote_addr;
+							proxy_set_header Host $http_host;
+							proxy_pass http://localhost:8080;
+							proxy_redirect off;
+				   }
+				   
+				   // phần dưới đây là dùng cho swagger-ui trong springboot.
+				   
+				   location /swagger-ui {
+						proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+						proxy_set_header X-Forwarded-Proto $scheme;
+						proxy_set_header X-Real-IP $remote_addr;
+						proxy_set_header Host $http_host;
+						proxy_pass http://localhost:8080;
+						proxy_redirect off;
+					}
+
+					location /swagger-resources {
+						proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+						proxy_set_header X-Forwarded-Proto $scheme;
+						proxy_set_header X-Real-IP $remote_addr;
+						proxy_set_header Host $http_host;
+						proxy_pass http://localhost:8080;
+						proxy_redirect off;
+					}
+
+					location /v3/api-docs {
+						proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+						proxy_set_header X-Forwarded-Proto $scheme;
+						proxy_set_header X-Real-IP $remote_addr;
+						proxy_set_header Host $http_host;
+						proxy_pass http://localhost:8080;
+						proxy_redirect off;
+					}
+				}
+			* check xem config đã đúng chưa bằng câu lệnh:
+				* sudo nginx -t
+				* reload lại nginx khi nginx thông báo test successful.
+			* Link file config từ site-available sang site-enable
+				* vì file nginx.conf của nginx chỉ đọc các file config trong site-enable.
+				* sudo ln -s /etc/nginx/sites-available/<file_name> /etc/nginx/sites-enabled/<file_name>
+	* Bước 11: chạy backend server.
+		* Chạy bằng câu lệnh sau:
+			* java -jar <path_to_file> &
+			* lưu ý phải có '&' ở cuối để chạy ở chế độ detach.
+			* check xem chạy ở chế độ detach chưa: ps aux // xem các tiến trình đang chạy trên server.
+	* Bước 12: Chuyển server_name cho Cloudflare quản lý:
+		* Trong một trang web bình thường, phải có một bên đứng ra để quản lý tên miền và cung cấp các chứng chỉ an toàn cho
+			tên miền đó, như chứng chỉ SSL mà mọi tên miền nên có, nếu không một số trình duyệt sẽ không cho người dùng truy cập
+			vào trang wev bởi vì có thể đánh cắp dữ liệu người dùng.
+		* Cloudflare là bên trung gian miễn phí giúp quản lý tên miền, cung cấp chứng chỉ SSL cơ bản miễn phí cho các trang web nhỏ.
+		* Vào Cloudflare, đăng kí và tạo project mới và gắn tên miền và ipvr của server.
+		* khi làm xong bước này, khi ping đến tên miền của bạn, ipv4 của server sẽ không hiện mà là ip của máy chủ chung của 
+			Cloudflare, đây là một cơ chế tốt để bảo vệ trang web tránh khỏi các DOS và DOSS attack.
+		* và khi ssh đến tên miền thì cũng không đăng nhập được, bới vì bạn đang ssh đến máy chủ của Cloudflare, chứ không phải
+			server của bạn. hãy giữ kín ipv4 của máy chủ, không được làm lộ ra ngoài.
+		* flow của request từ trình duyệt đến server như sau:
+			* broswer gửi request -> request sẽ đến máy chủ Cloudflare, Cloudflare dựa vào tên miền gửi đến server của mình.
+			
+	* ===>>>> Kết: trên đây là một số bước cơ bản để deploy một web two-side, sẽ update deploy bằng docker as soon as possible.
+
 	
 * các bước để sử dụng cloud service: (các cloud services đều có mô típ kết nối và sử dụng giống nhau, nên chỉ cần nắm bắt
 	một số service thì có thể tự tìm hiểu)

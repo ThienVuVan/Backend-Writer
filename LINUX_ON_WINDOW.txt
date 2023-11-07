@@ -198,7 +198,7 @@
 		* ssh -i <private key file> ubuntu@.... -> connect to server ubuntu.
 		* When you connect to server, it will compare you private key and puclic key, if success, go into server.
 	* Login by root
-		* go to ec2, change root password
+		* go to ec2, change root passwor
 		* connect ec2 with root account
 		* sudo passwd root
 		* go to /etc/ssh/sshd_config
@@ -207,6 +207,20 @@
 		* set passwordauthentication yes
 		* save and reboot server.
 		* login: ssh root@<IP>.
+		
+	* Nếu mà không authen được bằng password, thì reboot lại máy ảo, đối với vm của azure thì vào reset password.
+	* add new user and set to sudo group or set sudo privilage.
+		* adduser <newuser> // flow vm.
+		* usermod -aG sudo <newuser> // flow vm
+		* // if cannot using two command, login with root or use sudo.
+		* groups <newuser> // check groups of user.
+		
+		* // set sudo privilage in file
+		* visudo // open config.
+		* add this command after command 'root ALL=(ALL:ALL) ALL' '<newuser> ALL=(ALL:ALL) ALL';
+		* save and now you can use normarl user with sudo privilage.
+	
+		
 	
 	* Using Cloudflare for your domain.
 		* you need to change name server of your domain to cloudflare.
@@ -264,4 +278,10 @@
 
 vim /etc/ssh/sshd_config
 		
+	
+
+
+
+
+
 	
