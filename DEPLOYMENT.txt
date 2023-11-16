@@ -160,7 +160,7 @@
 			tên miền đó, như chứng chỉ SSL mà mọi tên miền nên có, nếu không một số trình duyệt sẽ không cho người dùng truy cập
 			vào trang wev bởi vì có thể đánh cắp dữ liệu người dùng.
 		* Cloudflare là bên trung gian miễn phí giúp quản lý tên miền, cung cấp chứng chỉ SSL cơ bản miễn phí cho các trang web nhỏ.
-		* Vào Cloudflare, đăng kí và tạo project mới và gắn tên miền và ipvr của server.
+		* Vào Cloudflare, đăng kí và tạo project mới và gắn tên miền và ipv4 của server.
 		* khi làm xong bước này, khi ping đến tên miền của bạn, ipv4 của server sẽ không hiện mà là ip của máy chủ chung của 
 			Cloudflare, đây là một cơ chế tốt để bảo vệ trang web tránh khỏi các DOS và DOSS attack.
 		* và khi ssh đến tên miền thì cũng không đăng nhập được, bới vì bạn đang ssh đến máy chủ của Cloudflare, chứ không phải

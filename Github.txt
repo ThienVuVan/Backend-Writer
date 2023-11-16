@@ -96,6 +96,10 @@ SSH key
 	* khi ở nhánh head/MEGRING, nếu không dùng được command line để sửa conflist như lệnh các thao tác với lệnh vi
 		thì nếu ide của bạn hỗ trợ, thì bạn mở file conflict lên thì ide vẫn hiển thi chỗ lỗi với các ký tự nhận biết của git.
 		
+* Experience:
+	* khi xử lý conflict, nếu mà có nhiều conflict gây ra bởi code mới, cần hỏi họ đã code thêm file nào và thay đổi ở
+	file nào, để tránh trường hợp họ lỡ thay đổi ở file mà không biết, và mình cũng không biết nene merge code mới hay code cũ,
+	rất dễ xảy ra conlict.
 	
 	
 	

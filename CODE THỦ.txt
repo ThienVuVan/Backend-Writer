@@ -383,6 +383,213 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 		* muồn họi đến super.super, thì có giải pháp khác là trong class con, tạo một đối tượng class supper.super
 		và mỗi lần cần gọi đến method của class super.super, ta chỉ cần gọi đến object super.super đã được khai báo.
 
-
-
-
+* Java Collections
+	* List: là một interface nằm trong gói java.util, kế thừ từ Collections interface, và cấp cuối là Itertor interface.
+	* List có thể chứa các phần tử có giá trị trùng lặp, tự mở rộng, và được đánh index.
+	* List có các triển khai như: ArrayList, LinkedList ...
+	* Các method của List hay dùng:
+		* void add(E element) - Thêm một phần tử vào cuối danh sách.
+		* void add(int index, E element) = Thêm một phần tử vào vị trí chỉ định trong danh sách.
+		* boolean addAll(Collection<? extends E> c) - Thêm tất cả các phần tử trong Collection chỉ định vào cuối danh sách.
+		* boolean addAll(int index, Collection<? extends E> c) - Thêm tất cả các phần tử trong Collection chỉ định vào vị trí chỉ định trong danh sách.
+		* clear() - Xóa tất cả các phần tử trong danh sách.
+		* contains(Object o) - Kiểm tra xem danh sách có chứa đối tượng định trước hay không.
+		* containsAll(Collection<?> c) - Kiểm tra xem danh sách có chứa tất cả các phần tử trong Collection chỉ định hay không.
+		* equals(Object o) - So sánh danh sách với đối tượng chỉ định để xác định liệu chúng có bằng nhau hay không.
+		// lưu ý, đối với method equal(), nếu kiểu dữ liệu không phải của java định nghĩa thì phải implement lại hàm equal() để cho chạy đúng.
+		* object get(int index) - Trả về phần tử tại vị trí chỉ định trong danh sách.
+		* hashCode() - Trả về mã băm của danh sách.
+		* indexOf(Object o) - Trả về vị trí đầu tiên của phần tử trong danh sách có giá trị bằng với đối tượng chỉ định.
+		* lastIndexOf(Object o) - Trả về vị trí cuối cùng của phần tử trong danh sách có giá trị bằng với đối tượng chỉ định.
+		* isEmpty() - Kiểm tra xem danh sách có rỗng hay không.
+		* iterator() - Trả về một Iterator để lặp lại các phần tử trong danh sách.
+		* object remove(int index) - Xóa phần tử tại vị trí chỉ định trong danh sách.
+		* object remove(Object o) - Xóa phần tử đầu tiên trong danh sách có giá trị bằng với đối tượng chỉ định.
+		* removeAll(Collection<?> c) - Xóa tất cả các phần tử trong danh sách có trong Collection chỉ định.
+		* replaceAll(UnaryOperator<E> operator) - Thay thế tất cả các phần tử trong danh sách bằng kết quả của áp dụng toán tử đơn nguyên chỉ định tới mỗi phần tử.
+		// method trên update cách sử dụng sau.
+		* retainAll(Collection<?> c) - Xóa tất cả các phần tử trong danh sách không có trong Collection chỉ định.
+		* object set(int index, E element) - Thay thế phần tử tại vị trí chỉ định trong danh sách bằng một phần tử mới.
+		* size() - Trả về số lượng phần tử trong danh sách.
+		* sort(Comparator<? super E> c) - Sắp xếp lại các phần tử trong danh sách bằng cách sử dụng Comparator chỉ định.
+		// method trên update cách sử dụng sau.
+		* subList(int fromIndex, int toIndex) - Trả về một danh sách con của danh sách, chứa các phần tử từ vị trí fromIndex đến vị trí toIndex – 1.
+		* toArray() - Chuyển đổi danh sách thành một mảng.
+		* toArray(T[] a) - Chuyển đổi danh sách thành một mảng, với kiểu phần tử chỉ định.
+		
+	* Set là một interface kế thừa Collection interface. 
+	* Set không thể chứa các phần tử có giá trị trùng lặp, tự mở rộng, không được đánh index.
+	* Set có các triển khai như: HashSet, LinkHashSet, TreeSet ...
+	* Về cơ chế làm việc với dữ liệu, đã viết ở trên, search 'bucket or HashTable'
+	* Các method Set cung cấp để làm việc:
+		* boolean add(Object element) - Nó được sử dụng để chèn các phần tử vào set.
+		* boolean addAll(Collection c) - Nó được sử dụng để chèn tất cả các phần tử của c vào set.
+		* void clear() - Xóa tất cả các phần tử khỏi set.
+		* boolean contains(Object element) - Trả về true nếu tập hợp này chứa phần tử đã chỉ định.
+		* boolean containsAll(Collection c) - Trả về true nếu set chứa tất cả các phần tử của collection c đã chỉ định.
+		* boolean equals(Object o) - So sánh các đối tượng được chỉ định với set.
+		// cũng lưu ý như trên, phải implement lại equals() đối với dữ liệu java không định nghĩa và Set dùng HashTable, vì thế
+		// cũng phải implement lại HashCode() cho kiểu dữ liệu tự định nghĩa này.
+		* boolean isEmpty() - Trả về true nếu set không chứa phần tử.
+		* int hashCode() - Trả về giá trị mã băm
+		* Iterator iterator() - Trả về một trình vòng lặp iterator để duyệt qua các phần tử của set.
+		* boolean remove(Object o) - Xóa phần tử đã chỉ định khỏi set.
+		* boolean removeAll(Collection c) - Xóa khỏi set tất cả các phần tử của nó được chứa trong collection c đã chỉ định.
+		* boolean retainAll(Collection c) - Chỉ giữ lại các phần tử trong set được chứa trong collection c đã chỉ định.
+		* int size() - Trả về số lượng các phần tử của set.
+		* Object[] toArray() - Trả về một mảng chứa tất cả các phần tử trong set.
+		* T[] toArray(T[] a) - Trả về một mảng chứa tất cả các phần tử trong set, kiểu run-time của mảng trả về là kiểu đã chỉ định.
+		* Sort // Set không cup cấp method sort, muốn sort thì có thể dùng stream() trong java 8, có các method hữu ích để sort Set.
+	
+	
+	* Map là một interface kế thừa java collection.
+	* Map lưu trữ giá trị bằng cặp key-value.
+	* Map không thể chưa key giống nhau, nhưng có thể chứa value giống nhau với key khác nhau, tự mở rộng, không đánh index.
+	* cơ chế làm việc viết ở trên, search 'bucket' or 'hashtable'
+	* Map có các triển khai như HashMap.
+	* Map cung câp các method sau:
+		* void clear() - Gỡ bỏ tất cả cặp key/value từ Map đang gọi
+		* boolean containsKey(Object key) - Trả về true nếu Map đang gọi chứa k như là một key. Nếu không là false
+		* boolean containsValue(Object v) - Trả về true nếu Map đang gọi chứa v như là một value. Nếu không là false
+		* boolean equals(Object obj) - Trả về true nếu obj là một Map và chứa cùng các Entry. Nếu không là false.
+		* Object get(Object key) - Trả về value mà liên kết với key
+		* int hashCode() - Trả về hash code cho Map đang gọi
+		* Object put(Object key, Object value) - Đặt một entry vào Map đang gọi, ghi đè bất kỳ value trước mà liên kết với key.
+			Với key và value tương ứng là k và v. Trả về null nếu key đã không tồn tại. Nếu không thì,
+			value trước mà liên kết với key được trả về
+		* void putAll(Map map) - Đặt tất cả entry từ m vào trong Map này
+		* Object remove(Object key) - Gỡ bỏ entry mà có khóa là key được chỉ định.
+		* int size() - Trả về số các cặp key/value trong Map
+		* Collection values() - Trả về một tập hợp chứa các value trong Map. Phương thức này cung cấp một collection-view
+		của các value trong Map
+		* Set keySet() - Nó được sử dụng để trả đối tượng Set có chứa tất cả các keys.
+		Set entrySet() - Nó được sử dụng để trả lại đối tượng Set có chứa tất cả các keys và values.
+	
+	* Stream trong java 8
+		* Stream là một đối tượng mới trong java 8, giúp làm việc với Collection và Array đơn giản hơn nhiều.
+		* Stream nằm trong gói java.util.stream
+		* Collection interface được hỗ trợ hai phương thức để tạo Stream
+			* stream(): trả về môt stream được sử lý theo tuần tự.
+			* parallelStream(): trả về một stream song song, các xử lý sẽ được thực hiện song song.
+		* Trong phần đầu, ta tìm hiểu stream() tuần tự trước.
+		
+		* Đặc điểm của java Stream:
+			* không lưu các phần tử của Collection hay Array, chỉ thực hiện các phếp toán tổng hợp để có đc stream mong muốn.
+			* không phải là một cấu trúc dữ liệu
+			* dữ liệu để xử lý ở trong một stream, không ảnh hưởng dến dữ liệu nguồn.
+			* tất cả hoạt động của stream là Lazy.
+			* các phần từ chỉ được truy cập một lần trong vòng đời của stream, giống như iterator, phải tạo mới để duyệt lại.
+			* stream không dùng lại được khi đã gọi thao tác cuối.
+			* không dùng được index trong stream
+			* stream hỗ trợ thao tác song song các phần tử Collection hay Array nhờ ParellelStream().
+		
+		* nói dễ hiểu hơn, stream là một luồng chứa các dữ liệu nguồn và thực hiện tính toán trên luồng đó,
+			nên không thay đổi dữ liệu gốc, và có thể chuyển đổi kiểu dữ liệu thành các dạng khác nhờ hàm collect();
+		
+		* Cách làm việc với stream: làm việc với string luôn luôn thông qua 3 bước sau.
+			* tạo Stream (stream source).
+			* thực hiện các thao tác trung gian (intermediate oprations), là thực hiện biến đổi stream ban đầu thành stream khác.
+			* thực hiện thao tác cuối (terminal operation), là lệnh cuối để nhận kết quả và sau đó không thể sử dụng lại stream.
+				// ví vụ
+				myArray.stream().filter(x => x % 2 == 0).count();
+				// stream() -> là tạo stream source.
+				// filter() -> là intermediate operation
+				// count() -> là terminal operation
+			* Cấu trúc chung của một stream pipeline gồm:
+				* 1 stream source
+				* 0 hoặc nhiều intermediate operation
+				* 1 terminal operation.
+		
+		* Các cách tạo stream.
+			* Stream interface trong gói java.util.stream chỉ làm việc với kiểu dữ liệu reference.
+			* với các kiểu primitive, có thể sử dụng stream dành cho các kiểu đối tượng đó như: IntStream, LongStream, DoubleStream ...
+			
+		* các intermediate operation quen thuộc:
+			* filter()
+				* nhận vào một predicate, triển khai bằng lamda hoặc method reference
+			* skip(), limit()
+				* skip: loại bỏ không lặp qua các phần tử trước nó.
+				* limit: giới hạn trong stream mới có bao nhiêu phần tử.
+			* map()
+				* thực hiện biến đổi các elemnt trong stream và trả vào stream mới.
+			* sorted()
+				* nhận vào comparator, triển khai bằng lambda hoặc method reference.
+			* forEach()
+				* lặp qua từng phần tử và làm theo chỉ định.
+			* collect()
+				* gom các phần tử lại và làm theo chỉ định.
+			* anyMatch(), allMatch(), noneMatch()
+				* đều nhận vào predicate, triển khai bằng lambda hoặc method reference.
+				* anyMatch: trả về true nếu phần tử đầu tiên match predicate, còn không trả về false.
+				* allMatch: trả về true nếu all element trong stream match, nếu có element không match trả về false.
+				* noneMatch: trả về true nếu không có phần tử nào match, ngược lại false.
+			* count()
+				* đếm số element trong stream trả về số nguyên kiểu Long.
+			* min(), max()
+				* đều nhận vào comparator.
+				* thực hiện so sánh và lấy giá trị lớn nhất và nhỏ nhất.
+			* reduce()
+				* update
+			* summaryStatistics()
+				* trả về một summaryStatistics chứa các giá trị: count(), sum(), avg(), min(), max().
+				* Có các kiểu như IntSummaryStatistics, DoubleSummaryStatistics, LongSummaryStatistics.
+			* boxed()
+				* update
+		* Luồng song song - parallel Streams
+			* như đã nói ở trên, stream có hai dạng là tuần tự (sequential) hoặc song song(parallell)
+				nghĩa là các thao tác trên stream tuần tự chỉ được chạy trên một luồng, còn các thao tác trên stream song song
+				được thực hiện trên đa luồng.
+				// hiểu đơn giản là một stream sẽ có n số thao tác nhất định, thay vì n thao tác chạy trên một core thì n thao tác
+				sẽ được jvm chia đều và chạy trên nhiều core tùy theo số core của máy tính.
+			* chỉ cần thay stream() thành parallelStream(), nếu máy tính có nhiều core thì tốc độ để thực hiện xong n thao tác càng nhanh.
+		
+		* // chi tiết xem code tại JavaBackend project.
+	
+	* Bàn về lamda expression
+		* Như đã nói về funtional interface, thì function interface được ra mắt trong java 8, nó giúp thực hiện hóa mô hình lập trình
+		hướng chức năng (functional programing), trước java 8, mọi method đều nằm trong đối tượng, tức là hướng đối tượng hoàn toàn, muốn
+		sử dụng các method phải khởi tạo object hoặc là dùng tên object. và functional interface giúp thực hiện hóa việc này.
+		* trước đây, để dùng một interface mà chưa có class nào triển khai, thì ta có thể trực tiếp khai báo trong class (inner class)
+		và được gọi là anonymous class, nhưng nó vẫn là đi triển khai một class, chưa là một chức năng riêng biệt.
+		* lamda expression giúp ta triển khai functional interface một cách ngắn gọn, hướng chức năng hoàn toàn, không thuộc về class nào
+		và không có bất kỳ access modifier nào. và việc triển khai lamda gọi là một anonymous method.
+	
+		* Tồng quan:
+			* Cung cấp bản implement cho Functional interface.
+			* Viết ít code hơn.
+			* Hiệu quả hơn nhờ hỗ trợ thực hiện tuần tự (sequential) và song song (parallel) thông qua Stream API.
+		* Cú pháp biểu thức lamda: (argument-list) -> {body}
+			* argument-list: có thể có hoặc không có, tùy thuộc vào parameter của functional interface muốn triển khai
+			* arrow-function (->): dùng để liên kết phần argument-list và body
+			* body: chứa các câu lệnh của biểu thức lamda
+		* sự khác biệt của biểu thức lamda:
+			* không có tên: tức là một anonymous method
+			* có thể có hoặc không có câu lệnh return: tức là không tường minh, java có thể tự suy luận đc kiểu trả
+			về theo code thực thi.
+		* Trước Java 8: chúng ta tạo anonymous inner classes để triển khai chức năng của interface.
+		* Từ Java 8: sử dụng biểu thức lambda thay vì các anonymous inner classes.
+		
+	* Các loại functional interface mà java định nghĩa phổ biến:
+		* Comparator: dùng để so sánh hai đối tượng định nghĩa một phương thức duy nhất
+			là compare(T o1, T o2) để so sánh hai đối tượng o1 và o2.
+			* ví dụ: List<String> names = Arrays.asList("John", "Doe", "Alice", "Bob");
+					 Collections.sort(names, (s1, s2) -> s1.compareTo(s2)); // triển khai bằng lamda expression
+		* Predicate: được dùng để kiểm tra một điều kiện.
+			* Nó có một phương thức là test(T t) trả về true hoặc false dựa trên điều kiện kiểm tra.
+			* ví dụ: List<String> names = Arrays.asList("John", "Doe", "Alice", "Bob");
+					Predicate<String> startsWithA = s -> s.startsWith("A"); // triển khai bằng lamda expression.
+					List<String> result = names.stream().filter(startsWithA).collect(Collectors.toList());
+		* xem code trong project java8
+		
+	* Bàn về Method Reference: được giới thiệu java 8, cũng hỗ trợ cho việc lập trình functional programing.
+		* thay thế cho lamda expression, giúp cho lamda expression được rút gọn ngắn lại hơn giúp dễ đọc mà nguồn.
+		* ví dụ: 
+			// Lambda expression
+			List<String> names = Arrays.asList("John", "Doe", "Alice", "Bob");
+			names.forEach(s -> System.out.println(s));
+			// Method reference
+			names.forEach(System.out::println);
+			// forEach(String::toString) == s -> String.toString(s)
+		* method reference không thể thay thế cho tất cả trường hợp của lamda expression, việc một lamda expression khó không thể triển khai
+		bằng method reference.
+		

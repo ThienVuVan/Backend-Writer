@@ -153,7 +153,7 @@
 		* WORKGIR path: chỉ định thư mục làm việc cho các lệnh ADD, COPY, RUN.
 			* ví dụ: RUN mkdir /app
 					 WORKGIR /app
-					 COPY index.html .
+					 COPY index.html.
 					-> ở đây thư mục được chỉ định để làm việc là /app, nên chỉ cần để '.', docker sẽ tự hiệu copy vào /app.
 		
 		* USER name: chỉ định user nào làm việc.
