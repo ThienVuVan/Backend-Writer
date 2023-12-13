@@ -1052,7 +1052,7 @@ cấu trúc thì xem trong  slide.
 	* giải thích:
 		* một object ở trạng thái detached không thể đưa về trạng thái transient, vì thể ở đoạn code trên, ta đang đưa một
 			detached gán vào transient, nghĩa là ta đang đưa detach về transient. nên khi gán như vậy, role vẫn đang ở trạng
-			thái detached, khUser user = new User('thien', 20)i userRepository.save(user) thì đang lưu một detached object vào data, điều này gây lỗi vì
+			thái detached, khi User user = new User('thien', 20) userRepository.save(user) thì đang lưu một detached object vào data, điều này gây lỗi vì
 			hibernate chỉ có thể lưu và làm việc với các persistent object.
 	* giải pháp:
 		User user =userRepository.save(new User('thien', 20));
@@ -1076,6 +1076,7 @@ cấu trúc thì xem trong  slide.
 	* đối với các hàm mặc định của datajpa, tất cả các hàm đã được bọc trong @Transactional.
 	* khi cần làm việc với database mà không thông qua các hàm của jpa và bằng native query, bắt buộc phải mở transactional,
 		vì spring data jpa sẽ không gọi hibernate để quản lý transaction đối với các loại làm việc với database này.
+	* hãy bọc transactional ở tầng service đối với các lời gọi mà spring không hỗ trợ.
 
 * Trong cơ chế IOC, việc java tự tạo các javaBeans bằng cách gọi đến default constructor của bean đó, vì thế, khi triển
 	khai bất kỳ bean vào, phải có default constructor.

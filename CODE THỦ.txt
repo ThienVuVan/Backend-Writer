@@ -534,7 +534,8 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 				* trả về một summaryStatistics chứa các giá trị: count(), sum(), avg(), min(), max().
 				* Có các kiểu như IntSummaryStatistics, DoubleSummaryStatistics, LongSummaryStatistics.
 			* boxed()
-				* update
+				* Được thiết kế cho các stream của primitive type (IntStream, DoubleStream, and LongStream) để đóng gói
+				các primitive element trong stream thành các Wrapper Class tương ứng.
 		* Luồng song song - parallel Streams
 			* như đã nói ở trên, stream có hai dạng là tuần tự (sequential) hoặc song song(parallell)
 				nghĩa là các thao tác trên stream tuần tự chỉ được chạy trên một luồng, còn các thao tác trên stream song song
@@ -592,4 +593,40 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 			// forEach(String::toString) == s -> String.toString(s)
 		* method reference không thể thay thế cho tất cả trường hợp của lamda expression, việc một lamda expression khó không thể triển khai
 		bằng method reference.
+	
+	* Collection và Collections
+		* Collection là interface cao thứ 2 trong Collection framework, đứng đầu là Iterable.
+		* Collections là một class, cung cấp các static method để thao tác trên các Collection object.
+		* Phần này chỉ nói về Collections Class.
+		* Đặc điểm:
+			* hỗ trợ các thuật toán đa hình hoạt động trên collection.
+			* nếu truyền vào một null object, Collections sẽ ném ra lỗi NullPointerException.
 		
+		* một điểm cần lưu ý
+			* đối với stream, nó luôn tác động và các phần tử được copy ở luồng riêng, nhưng đối với các method của Collections
+			method nào thay đối element thì sẽ thay đổi trên phần tử gốc, nghĩa là sau các operations, object nguồn đã bị thay đổi.
+		* Các thuộc tính của Collections:
+			* static List EMPTY_LIST: khởi tạo một list rỗng, inmutable
+			* static Map EMPTY_MAP: khởi tạo một map rỗng, imutable
+			* static EMPTY_SET: khởi tạo một set rỗng, imurtable
+		* Các method phổ biến hay dùng:
+			* addAll(Collection, T ...elements): thêm các elements và Collection.
+			* binarySearch(List extend Comparable, T key): tìm kiếm và trả về index.
+			* void copy(List dest, List src): copy elements này sang list dest.
+			* disjoint(collection, collection): Trả về true nếu hai bộ sưu tập được chỉ định không có các phần tử chung.
+			* emptyList(): trả về list rỗng và immutable
+			* emptySet():
+			* emptyMap():
+			* file(List t, T obj): thay thế tất cả phần tử trong danh sách được chỉ định với phân tử được chỉ định
+			* frequency(Collection c, Object o): trả về số lượng các phần tử có trong collection bằng đối tượng chỉ định
+			* có rất nhiều phương thức hay, hãy đọc thêm trong library
+	
+	* ==>> Khi làm việc với Collection, chọn Collections hoặc stream, search cách sử dụng nếu không biết.
+			
+		
+	* Comparable and Comparator:
+		* OverView
+			* Comparable dùng cho các method của Collections hay stream cho so sánh mặc đinh, đối với các kiểu tự định nghĩa phải
+			implement lại.
+			* Comparator dùng cho các trường hợp mà các method của Collections hay stream cần truyền vào một Comparator để dựa vào
+			so sánh. Có thể được định nghĩa theo nhiều cách khác nhau và linh hoạt hơn.

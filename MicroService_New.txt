@@ -1,0 +1,8 @@
+
+* mọi logic nên sử lý ở tầng service.
+* valid in model or dto
+* transactional(readOnly = true)
+
+* WebClient
+* TestContainer
+* spring cloud euruka
