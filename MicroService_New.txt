@@ -1,8 +1,102 @@
+* Oauth 2: là authorization protocol, chứ không phải authentication protocol, tức là nó server cần được user cấp quyền để truy cấp
+	user resource trong provider(google, github ...) chứ không phải là Oauth đi xác minh user đó có hợp lệ hay không.
+	* oauth 2 khác với oauth 1 là có thể access được với user resource mà không cần user cung cấp credential để truy cập vào bên provider,
+	chỉ cần user cấp quyền cho server.
+	* oauth 2 sử dụng access token để truy cập vào bên thứ 3, oauth 2 không có đinh dạng token riêng, nhưng đa số là dụng định dạng JWT.
+	* Spring Security OAuth xây dựng Spring Security, tức là Spring Security có gì, Spring Security OAuth có cái đấy.
+	* Spring Security OAuth tích hợp thêm và triển khai giao thức OAuth 2.0 trong ứng dụng Spring
+	* OAuth 2.0 là một giao thức ủy quyền mạnh mẽ
+	* oauth là một protocol, đã phát triển đến version 2 nên gọi là oauth2.
+	* ví dụ luồng oauth2 đơn giản như sau:
+		* khi application muốn truy cập vào google để lấy user-resource, application sẽ gọi đến trang google login để user nếu chấp nhận
+		sẽ đăng nhập và có thể gán quyến cho phiên đó.
+		* sau đó google sẽ trả access token về cho application, và application sẽ dùng token để truy cập vào google để lấy user-resource,
+		google sẽ validate whether that access token is valid, nếu valid, application sẽ được lấy các resource mà access token đó được gán.
+	
+* Flyway là một công cụ quản lý phiên bản cơ sở dữ liệu (database migration tool) được sử dụng để quản lý và tự động hóa việc triển khai
+ và cập nhật schema của cơ sở dữ liệu. Nó giúp quản lý các phiên bản của cơ sở dữ liệu thông qua các tập tin migration, điều này làm cho
+ việc theo dõi và duy trì schema trở nên dễ dàng hơn trong quá trình phát triển ứng dụng.
+	* Migration Scripts: Flyway sử dụng các tập tin script SQL để mô tả các thay đổi cấu trúc cơ sở dữ liệu.
+	Mỗi script có một số phiên bản và được áp dụng theo thứ tự phiên bản.
+	* Version Control: Các migration script được quản lý như mã nguồn thông qua quản lý phiên bản, giúp theo dõi và kiểm soát các thay đổi
+	trong cơ sở dữ liệu theo thời gian.
+	* Command-Line và API: Flyway có thể được sử dụng thông qua giao diện dòng lệnh hoặc tích hợp vào quy trình triển khai tự động của
+	bạn bằng cách sử dụng API Java.
+	* Đa nền tảng: Flyway hỗ trợ nhiều loại cơ sở dữ liệu như MySQL, PostgreSQL, SQL Server, Oracle, và nhiều loại khác.
+	* Integrations: Nó tích hợp tốt với các công cụ phổ biến khác trong quá trình phát triển phần mềm và triển khai như Maven,
+	Gradle, Ant, Spring, và nhiều hơn nữa.
+	* Mỗi file script là một version của database, nếu version này đã được lưu trong db, nếu bạn thay đổi scripts trong file script này,
+	flyway sẽ báo lỗi vì xung đội version, mỗi khi muốn thay đổi database, bạn phải tạo một file script mới và viết script vào đó.
+	* file script có câu trúc như sau: 'V1__des_des.sql' : trong shema sẽ có table flyway history để lưu vesion này.
+	* flyway sẽ tự động đọc các file này đựt trong folder resource/db/migration/file.sql và chạy đến file cuối cùng.
 
-* mọi logic nên sử lý ở tầng service.
-* valid in model or dto
-* transactional(readOnly = true)
+* spring cloud euruka
+	* hiểu là discovery server, là trung tâm kết nối các service lại với nhau, giúp các service có thể biết nhau và gọi đến nhau.
+	* khi khởi động một service, khi service này được setting là euruka client, service này sẽ gọi đến euruka server với đường dẫn
+	được setting trong properties hoặc yml, và được euruka server nhận là một client và euruka server sẽ trả về cho euruka client
+	tất cả các service đang có trong euruka server.
+	* khi service này gọi đến 1 service khác, nếu service này đã lưu service cần gọi đến đang có địa chỉ ở đâu, thì nó sẽ không cần 
+	gọi đến euruka server để tìm service theo tên (tên của service được đặt trong properties hoặc yml, tên của service sẽ được euruka
+	server lưu trữ đánh dấu cho địa chỉ của service đang chạy), tên ở đây là webclient đang gọi đến.
+	* nếu service cần gọi đến chưa được lưu trong service gọi, thì service gọi sẽ gọi đến euruka server để tìm service cần gọi.
+	* lưu ý: nếu một service được chạy trên nhiều địa chỉ khác nhau (multiple service), tức là một tên nhưng có nhiều phiên bản chạy trên
+	nhiều cổng khác nhau, thì service sẽ bị confused, không biết cần gọi service nào, điều này khiến webclient không biết cần chọn service
+	đang chạy trên cổng nào để chọn, nên cần cài đặt webclient có anotation @Loadbalance (cân bằng tải) thì webclient sẽ chỉ gọi đến 1 service
+	trong nhiều service giống nhau.
+	* sẽ update các thuật toán loadbalance cho server để cân bằng luồng request chia đều cho các server sau.
+	
+* spring cloud gateway
+	* gateway (spring cloud gateway) được xây dựng trên spring reactor, hay spring webflux, dùng để route, pridicate, filter các request
+	và gửi đến các service khác trong hệ thống
+	* có nhiều loại api-gateway như Kong Api, ... nhưng ở đây ta dùng spring-cloud-gate trong landscape của spring.
+	* vấn đề đặt ra khi trong một landscape có nhiều service, và mỗi service chạy trên một port hoặc một ip khác nhau, nếu muốn gọi đến
+	service nào thì cần gọi địa chỉ riêng của service đó, điều này does not make sence lắm. chính vì thế cần một service đứng ra nhận
+	tất cả các request và phân loại để gửi đến service tương ứng.
+	* api-gateway ra đời để giải quyết vấn đề trên, và trong spring ta sử dụng spring-cloud-gateway
+		* ba điểm đặc biệt trong api-gateway (spring) là: routes, predicate, filters.
+			* route: dùng để lưu uri cần route tới và cả id của route
+			* predicate: dùng để phân loại request để match request = true thì route tới service tương ứng.
+			* filter: dùng để biến đổi request và route tới service tương ứng.
+		* một điều quan trọng: vì api-gateway cũng là một service nằm trong microservice landscape, nên nó cũng phải là một euruka client
+		để có thể call euruka server để lấy tất cả các name và địa chỉ của các service trong landscape để route, và khi gọi route nó cũng
+		cần cơ chế loadbalance trong trường hợp có nhiều một service-name mà có nhiều địa chỉ đang chạy. (chỉ cần thêm lb trước uri, xem code)
+		
+* TestContainer
+	* là một thư viện của java, cung cấp tính năng testing api và sử dụng junit5
+	* trong việc phát triển api, khi test api, ta hay gọi trực tiếp đến database, và khi gọi nhiều test nhiều, database sẽ confused database
+	và không thuận tiện khi phải gọi api thông qua bên bên thứ ba như brower, postman ...
+	* thế làm sao để gọi đc api trong chính project và không sử dụng đến database, giải pháp là dùng TestContainer kết hợp với MockMVC
+	và Junit5
+	* TestContainer cung cấp cách initialize và pull một image và run thành container của database về, cung cấp dynamic properties
+	để truy cập vào database trong container.
+	* MockMVC sẽ dùng perform để gọi đến api, và khi chạy test, api sẽ hoạt động với database trong container chứ không phải db thật,
+	khi test xong, container sẽ stop và mọi thứ biến mất, kết quả test sẽ được trả về, không phải làm việc gì với db thật.
+	* Junit: dùng viết test (chắc ai cũng biết rồi ha)
 
 * WebClient
-* TestContainer
-* spring cloud euruka
+	* làm thế nào để service này có thể gọi đến service thông qua api, ta có thể sử dụng RestTemplate hoặc WebClient, trong lần viết này
+	ta sẽ sử dụng webclient.
+	* WebClient là Object nằm trong module webflux (built on spring reactor), chứ không phải nằm trong springmvc.
+	* WebClient Bean dùng để gọi đến các api ở service khác, built RequestParam, Built Mono, request synchronous hoặc Asynchronous.
+	* Hỗ trợ loadbalance khi có nhiều service thông qua anotaion @LoadBalanced
+	* cách config xem trong code (phần này sẽ đọc docs và update thêm).
+
+
+
+
+* spring web flux - cho lập trình reactive programing
+* spring cloud được xây trên spring webflux, chứ không phải spring web mvc
+* nếu bean cấu hình bằng method ,spring sẽ tạo ra bean với tên riêng là tên method, và chỉ khai báo đúng tên mới dùng đc.
+* mọi logic nên sử lý ở tầng service.
+* valid in model or dto
+* transactional(readOnly = true) // transaction này chỉ có quyền đọc, không có quyền ghi vào database.
+* mn clean verify
+* với nhưng public api, nên để là /public thì lúc filter không phải viết nhiều.
+* có hai kịch bản:
+	* 1 phát triển project cũ lên microservice
+		* có sẵn, chỉ cần chia nhỏ ra các project, tiết kiệm đc chắc 2 tháng.
+		* tích hợp thêm công nghệ, có thể đảo lộn nhiều luồng dữ liệu, nhưng có khung
+	* 2 phát triển cái mới
+		* thời gian phát triển ý tưởng và database và system khá lâu.
+		* chấp nhận lâu
+		
