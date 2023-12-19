@@ -630,3 +630,38 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 			implement lại.
 			* Comparator dùng cho các trường hợp mà các method của Collections hay stream cần truyền vào một Comparator để dựa vào
 			so sánh. Có thể được định nghĩa theo nhiều cách khác nhau và linh hoạt hơn.
+	
+	* Synchronize và Asynchronize.
+		* lập trình bất đồng bộ (code chương trình không chạy đồng bộ, tức là đa luồng, đã tìm hiểu rồi).
+		* vấn đề đặt ra là khi nhiều task chạy trên nhiều luồng khác nhau cùng truy cập vào một share resource nào đó,
+		các thread này sẽ thay đổi shared resource cùng một lúc, dẫn đến kết quả thực thi sai so với expectation.
+		* lập trình đồng bộ có hai dạng:
+			* khi chương trình chỉ chạy trên thread main -> nó đã đồng bộ sẵn
+			* khi chương trình có nhiều thread -> vấn đề đặt ra làm sao các parallel thread chỉ được lần lượt truy cập vào shared resource
+			chứ không phải được truy cập đồng thời cùng một lúc (sử lý đồng bộ trong bất đồng bộ)
+			* từ khóa Synchronize sẽ giải quyết vấn đề này: trước mỗi method, object, block, variable hãy thêm từ khóa Synchronize, java sẽ
+			khóa các elements trên, chỉ cho phép một thread tác động lên shared resource tại cùng một thời điểm, điều này đảm bảo chương
+			trình chạy đúng khi chương trình có nhiều thread.
+			* xem code chi tiết trong project
+			* phần này chưa thực hành nhiều (sẽ update soon).
+			
+	* Callable, Future và Excutor
+		* Trước đây muốn lập trình bất đồng bộ, ta phải extend thread (gọi start() để chạy)
+		hoặc implement runable (override lại run()) để có thể tạo ra các luồng riêng,
+		nhưng ta có thể dùng một cách ngắn gọn hơn và quản lý tốt hơn với Callable, Future và Excutor.
+		* Callable là một interface trong java, nó định nghĩa một công việc và trả về một kết quả trong tương lai và có thể throw Exception
+		* Future là kết quả trả về của Callable, nó thể hiện kết quả của một phép tính không đồng bộ, cho phép kiểm tra trạng thái của phép
+		tính (đã thực hiện xong chưa, kết quả trả về là gì…)
+		* Executors là một class tiện ích trong Java, dùng để tạo thread pool, đối tượng Callable cho các xử lý bất đồng bộ.
+		* khi submit một callable implementation vào excutorservice, ASynchronize task đó sẽ được chạy mà ko cần gọi call() method.
+		
+	* CompletableFuture
+		* là một đối tượng được giới thiệu trong java 8, tiện lợi hơn nhiều so trong việc thực hiện bất đồng bộ so với các cách trên.
+		* CompletableFuture là kết quả trả về của phép tính / method không đồng bộ, cho phép kiểm tra trạng thái của phép tính
+		(đã thực hiện xong chưa, kết quả trả về là gì…), bắt sự kiện khi method hoàn thành…
+		* có thể thực hiện Asynchronize task bằng method supplyAsync(Supplier) hoặc (Supplier, Excutor), và trả về một new CompletableFuture.
+		không cần thực hiện implement Callable để thực hiện ASynchronize task, vì CompletableFuture đã implement Callable và CompletionStage.
+		* supplier là functional interface, hãy triển khai bằng lamda expression.
+		* sẽ update thêm về sử lý đồng bộ trong bất đồng bộ.
+		* CompletableFuture chính nó giúp chạy ASynchronize task và cũng chính nó nhận result trả về từ ASynchronize task và nhiều method
+		để thực hiện tiếp (sẽ update các method sau).

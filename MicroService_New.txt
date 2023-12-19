@@ -79,10 +79,88 @@
 	* WebClient là Object nằm trong module webflux (built on spring reactor), chứ không phải nằm trong springmvc.
 	* WebClient Bean dùng để gọi đến các api ở service khác, built RequestParam, Built Mono, request synchronous hoặc Asynchronous.
 	* Hỗ trợ loadbalance khi có nhiều service thông qua anotaion @LoadBalanced
-	* cách config xem trong code (phần này sẽ đọc docs và update thêm).
+	* cách config xem trong code (phần này sẽ đọc docs và update thêm)
 
+* KeyCloak
+	* có rất nhiều loại authentication server, như google identity, OKTA, Spring Authentication Server (early access)
+	nhưng ở đây sử dụng keycloak.
+	* keycloak là một authentication server.
+	* trong spring sẽ cấu hình những thứ cần thiết như sau:
+		* client-id
+		* client-secret
+		* scope
+		* redirect-uri: gọi khi authen thành công.
+		* isser-uri: dùng để client gọi đến các uri liên quan để thực hiện quá trình authen, client sẽ truy cập vào isser-uri để fetch
+		tất cả các uri cần thiết về.
+	* trong keycloak cần cấu hình các thứ sau:
+		* realm: chứa các client, user, role ...
+		* client: client-id, client-authentication(on), redirect-uri.
+		* user: name and password
+	* flow:
+		* 1 khi vào api được bảo vệ, khi client đã được cấu hình oauth2 sẽ dựa vào isser-uri để gọi đến uri sau
+		http://localhost:8180/realms/Demo/protocol/openid-connect/auth?
+		keycloak sẽ mở ra trang login, và client cũng gửi các query string parameter đã config trong properties.
+		* 2 khi resource owner login(cấp quyền cho client), keycloak sẽ tự động gọi đên uri sau
+		http://localhost:8180/realms/Demo/login-actions/authenticate? để authenticate form data được gửi lên
+		* 3 nếu thành công keycloak sẽ gọi đến redirect-uri được setting sẵn hoặc đã được client gửi lên cùng với một mã code.
+		* 4 client sẽ dùng mã code dựa isser-uri gọi đến authentication server
+		* 5 authentication server sẽ trả về các thông tin như access token và id token.
+		* 6 client sẽ dựa vào access token và id token (and other info) để authen và set vào security context, 
+		* 7 client redirect đến endpoint một lần nữa.
+		* bạn không cần quan tâm việc spring security sử lý dữ liệu được trả về như thế nào, muốn lấy thông tin của user, hãy vào
+		securitycontext để lấy.
+		* nếu muốn xem response keycloak trả về khi client gọi, run mode debug trong OidcAuthorizationCodeAuthenticationProvider.class
+		break point tại dòng 'return AuthenticationResult'.
+	* flow ở trên cũng giống như bốn provider được spring security oauth2 cấu hình sẵn (google, facebook, hithub, okta)
+	vào CommonOAuth2Provider.class để xem 4 provider trên được cấu hình như thế nào.
+	* Note
+		* confidential client: là những service backend, cần trao đổi với các provider dưới nền, không thể hiện ra bên ngoài
+		* public client hay public facing client: là các project frontend như reactjs, anguler, Vue, MobilePhone ...
+		* access token: chỉ là đoạn mã được sinh ra bởi các ký tự vô nghĩa, với oauth2 protocol, chỉ access token được trả về
+		* nhưng với OIDC protocol (open id connect): được xây dựng từ oauth2, sẽ trả về cả access token và id token.
+		* id token: là đoạn mã được sinh ra và tích hợp các thông tin vào trong đó như: name, email, role ... (như đã thấy khi chạy debug
+		và đặt break point trong OidcAuthorizationCodeAuthenticationProvider.class).
+	* Nếu muốn kiểm soát tốt quá trình authen cà project ít service, thì nên tự triển khai authentication. giúp mã nguồn dễ hiểu hơn.
+	* Đối với nhiều service và một hệ thống thực sự lớn, nên triển khai thông qua authentication server bên ngoài.
+	* Dự án sắp tới chắc sẽ tự triển khai security trong api gateway.
+	
+* Cần làm rõ một số khái niệm:
+	* Sync/Async code và Sync/Async communication.
+	* Sync/Async code (đã đề cập trong file Code thủ, đơn giản chỉ là code multi-thread và sử lý đồng bộ trong code bất đồng bộ).
+	* Sync/Async communication (là việc sử lý quá trình các api giao tiếp với nhau)
+		* khi api này gọi đến api kia bằng Sync communication, khi api được gọi không trả lời hoặc trả lời chậm, api đang gọi sẽ bị dừng
+		không chạy tiếp được vì chưa có kết quả trả về của api được gọi, và thế là khi một service dừng, thread main của bạn đứng lại,
+		ứng dụng của bạn toang (bị treo), không sử lý được task khác.
+		-> Đó là Sync communication (api này cần kết quả của api kia mới chạy tiếp được)
+		* để giải quyết vấn đề này, cần triển khai Async communication khi các api gọi đến nhau, task mà api thực thi sẽ được chuyển thành
+		Async task (chạy trong thread riêng, gọi api khác cũng nằm trong Async task), điều này giúp thread main không hề bị ảnh hưởng khi
+		một service khác không trả lời, không quan tâm api được gọi có trả lời hay không, nếu không thì sử lý theo hướng khác.
+		* sử dụng CompletableFuture để thực hiện Async task, và áp dụng Resilience4J Circuit Breaker để kiểm soát các tác vụ trên.
 
-
+* Circuit Breaker là gì?
+	* Dịch sang nghĩa tiếng việt đó nôm na là là người ngắt mạch.
+	* Circuit breaker thực chất là set of state (closed, open, half-open)
+	* là một mô hình kiến trúc được sử dụng để quản lý và kiểm soát các lỗi trong hệ thống phần mềm. được thiết kế để giảm thiểu tác động
+	của lỗi và ngừng gửi các yêu cầu tới một dịch vụ hay thành phần cụ thể khi lỗi xảy ra quá mức cho phép.
+	* khi một service này gọi đến 1 service khác, simulate trong trường hợp service được gọi đã tắt, thì làm sao để service này lần sau biết
+	là service được gọi hiện tại không hoạt động và không cần gọi nữa để tăng hiệu năng chương trình, Circuit Breaker sẽ triển khai việc này.
+	* circuit breaker có ba trạng thái:
+		* closed: service được gọi đang được đánh dấu là hoạt động bình thường.
+		* open: service được gọi đang được đánh dấu là đã đóng.
+		* half-open: service được gọi đang được gọi lại để kiểm tra xem đã mở lại hay chưa.
+	* flow như sau:
+		* khi service gọi này gọi đến service được gọi, nếu hoạt động gửi và phản hồi ok, thì state của circuit breaker là closed
+		* khi service được gọi không trả lời hoặc trả lời quá chậm hoặc sau bao nhiêu lần gửi vẫn không trả lời(tùy vào setting)
+		state của circuit breaker sẽ được set về open, lần sau khi gọi thì circuit breaker sẽ gọi luôn fallback chứ ko gọi service
+		được gọi nữa.
+		* sau một khoảng thời gian nào đó (tùy vào setting), circuit break sẽ chuyển sang trạng thái half-open, circuit breaker sẽ gọi
+		đến service được gọi để xem service đó đã on hay chưa, nếu kết nối bth, state của circuit breaker sẽ chuyển thành closed, nếu không
+		state lại trở về open.
+	* đó là những cơ bản về circuit breaker architecture (sẽ update thêm).
+		
+* Resilience4J là gì ?
+	
+	
 
 * spring web flux - cho lập trình reactive programing
 * spring cloud được xây trên spring webflux, chứ không phải spring web mvc

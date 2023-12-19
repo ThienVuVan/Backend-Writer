@@ -1050,11 +1050,10 @@ cấu trúc thì xem trong  slide.
 	userRepository.save(user); // transfer transient to persistence.
 	// error: detached entity passed to persist, InvalidDataAccessApiUsageException, detached entity passed to persist
 	* giải thích:
-		* một object ở trạng thái detached không thể đưa về trạng thái transient, vì thể ở đoạn code trên, ta đang đưa một
-			detached gán vào transient, nghĩa là ta đang đưa detach về transient. nên khi gán như vậy, role vẫn đang ở trạng
-			thái detached, khi User user = new User('thien', 20) userRepository.save(user) thì đang lưu một detached object vào data, điều này gây lỗi vì
-			hibernate chỉ có thể lưu và làm việc với các persistent object.
-	* giải pháp:
+		* ở đây, role đang ở trạng thái detached, hibernate sẽ không thể lưu một instance ở trạng thái detached, ở đây là ta đang
+		lưu role, mà hibernate chỉ làm việc với các đối tượng được truyền vào persistence một cách hợp lệ.
+		* để giải quyết lỗi bên trên, ta phải đưa role trở lại trạng thái persistence như merge(), refresh(), update().
+	* giải pháp (chưa đúng, sẽ update sau)
 		User user =userRepository.save(new User('thien', 20));
 		* đưa user vào trạng thái persistence trước khi gán role, điều này làm role được đưa về trạng thai persistence,
 		đúng flow của hibernate state. và hibernate sẽ làm viêc đúng.
@@ -1062,6 +1061,7 @@ cấu trúc thì xem trong  slide.
 		* giải pháp này phải dùng hibernate thuần, mở session và thực hiện mọi thao tác trong một session,
 		không dùng được không spring data jpa
 		* chưa biết spring data jpa hỗ trợ đưa object trở lại persistence kiểu gì.
+			* update: gọi entitymanager hiện tại và đưa vào persistence context thông qua hàm update(), merge(), refresh()...
 
 * nói một chút về flow và cycle của các object khi làm việc với hibernate.
 	* transient -> persistence -> detached.
