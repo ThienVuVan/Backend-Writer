@@ -193,6 +193,9 @@
 	* su - <name> -> switch user.
 	* exit -> logout, switch to previous user.
 	
+	* passwd -> change password current user
+	* passwd <username> -> change password specific user
+	
 * Access to Server *
 	* By SSH
 		* ssh -i <private key file> ubuntu@.... -> connect to server ubuntu.
@@ -276,7 +279,12 @@
 		* We also can use Bucket of google cloud.
 		
 
-vim /etc/ssh/sshd_config
+* Runlevel
+	* init 3: giao diện dòng lệnh
+	* init 5: giao diện đồ họa: init 5
+	* init 0: shutdown
+	* init 6: reboot
+	* init 1: only one user use for fix files system
 		
 	
 

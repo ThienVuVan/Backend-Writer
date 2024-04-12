@@ -73,13 +73,19 @@
 	khi test xong, container sẽ stop và mọi thứ biến mất, kết quả test sẽ được trả về, không phải làm việc gì với db thật.
 	* Junit: dùng viết test (chắc ai cũng biết rồi ha)
 
-* WebClient
+* WebClient (asynchronous, non-bloking)
 	* làm thế nào để service này có thể gọi đến service thông qua api, ta có thể sử dụng RestTemplate hoặc WebClient, trong lần viết này
 	ta sẽ sử dụng webclient.
 	* WebClient là Object nằm trong module webflux (built on spring reactor), chứ không phải nằm trong springmvc.
+		* cho nên nó dùng cho lập trình non-bloking và asynchronous. (nó cũng có thể thực hiện các cuộc gọi block)
 	* WebClient Bean dùng để gọi đến các api ở service khác, built RequestParam, Built Mono, request synchronous hoặc Asynchronous.
 	* Hỗ trợ loadbalance khi có nhiều service thông qua anotaion @LoadBalanced
 	* cách config xem trong code (phần này sẽ đọc docs và update thêm)
+	* phải tìm hiểu thêm để kiểm soát được process.
+	* tìm hiểu luôn resttemplate(synchronous, blocking)
+
+* resttemplate gọi api theo synchronous và blocking, tức là luồng hiện tại sẽ bị block lại cho đến khi có resource trả về,
+	hạn chế sử dụng resttemplate trong lập trình phản ứng.
 
 * KeyCloak
 	* có rất nhiều loại authentication server, như google identity, OKTA, Spring Authentication Server (early access)
@@ -126,16 +132,19 @@
 	
 * Cần làm rõ một số khái niệm:
 	* Sync/Async code và Sync/Async communication.
-	* Sync/Async code (đã đề cập trong file Code thủ, đơn giản chỉ là code multi-thread và sử lý đồng bộ trong code bất đồng bộ).
+	* Sync code: code đồng bộ - code này chạy xong code kia mới chạy được, chương trình chỉ có một main thread
+	* Async code: code bất đồng bộ - bằng cách sử dụng multi-thread hoặc các thư viện hỗ trợ lập trình non-bloking và asynchronous.
+		* ví dụ sử dụng Thread, Runable, Callabe, CompletableFuture, Future, Excutor ...
+		* sử dụng các thư viện trong lập trình reactive như publiser, subcriber ...
 	* Sync/Async communication (là việc sử lý quá trình các api giao tiếp với nhau)
 		* khi api này gọi đến api kia bằng Sync communication, khi api được gọi không trả lời hoặc trả lời chậm, api đang gọi sẽ bị dừng
 		không chạy tiếp được vì chưa có kết quả trả về của api được gọi, và thế là khi một service dừng, thread main của bạn đứng lại,
 		ứng dụng của bạn toang (bị treo), không sử lý được task khác.
-		-> Đó là Sync communication (api này cần kết quả của api kia mới chạy tiếp được)
-		* để giải quyết vấn đề này, cần triển khai Async communication khi các api gọi đến nhau, task mà api thực thi sẽ được chuyển thành
-		Async task (chạy trong thread riêng, gọi api khác cũng nằm trong Async task), điều này giúp thread main không hề bị ảnh hưởng khi
-		một service khác không trả lời, không quan tâm api được gọi có trả lời hay không, nếu không thì sử lý theo hướng khác.
-		* sử dụng CompletableFuture để thực hiện Async task, và áp dụng Resilience4J Circuit Breaker để kiểm soát các tác vụ trên.
+		-> Đó là Sync communication (api này cần kết quả của api kia mới chạy tiếp được), cái này cần giải quyết bằng timlimiter
+		và code bất đồng bộ.
+		* đối với Async communication, khi các api gọi đến nhau, nó sẽ không quan tâm có được response hay không,
+		task mà api thực thi sẽ được chuyển thành đơn giản là chỉ gửi event cho task khác.
+		* sử dụng kafka để thực hiện Async communication, và áp dụng Resilience4J Circuit Breaker để kiểm soát gọi api.
 
 * Circuit Breaker là gì?
 	* Dịch sang nghĩa tiếng việt đó nôm na là là người ngắt mạch.
@@ -157,11 +166,47 @@
 		đến service được gọi để xem service đó đã on hay chưa, nếu kết nối bth, state của circuit breaker sẽ chuyển thành closed, nếu không
 		state lại trở về open.
 	* đó là những cơ bản về circuit breaker architecture (sẽ update thêm).
+	
+* spring-boot-starter-actuator
+	* là một phần của Spring Boot Actuator, một dự án con của Spring Boot, được thiết kế để cung cấp các chức năng quản lý ứng dụng
+	và theo dõi trạng thái của ứng dụng Spring Boot. 
+	* Spring Boot Actuator cung cấp các "endpoint" mà bạn có thể sử dụng để lấy thông tin về trạng thái của ứng dụng.
+	Ví dụ: /health, /info, /metrics, /env ...
+	* Quản lý ứng dụng (/actuator endpoint):
+	* Cung cấp một tập hợp các endpoint cho việc quản lý ứng dụng, ví dụ như /shutdown để tắt ứng dụng một cách an toàn,
+	/beans để hiển thị tất cả các bean được đăng ký, và nhiều endpoint khác.
+	* (update soon).
+	* có thể xem các api của actuator trong ide intelij có hỗ trợ.
+		* http://localhost:61860/actuator/beans
+		* /actuator/retryenvent
+		* /actuator/timelimeter
+		* /actuator/health
+		* nhiều api có thể xem đc nhiều thông số của application (tự tìm hiểu).
 		
 * Resilience4J là gì ?
+	* và để triển khai kiến trúc circuit breaker, tất nhiên là không làm bằng này, có nhiều thư viện hỗ trợ trong java.
+	* trong Module spring cloud circuit breaker, ta sẽ chọn sử dụng Resilience4J để triển khai circuit breaker architecture.
+	* sẽ update cách config và triển khai sau.
 	
-	
+	The decoration is as follows:
+	* CircuitBreaker ( TimeLimiter ( BulkHead ( method ( ) ) ) ) 
+	Method is invoked in a Thread Pool.
+	TimeLimiter limits the time of the thread, but the CompletableFuture is not/cannot be cancelled.
+	CircuitBreaker records exceptions.
+	* Retry ( CircuitBreaker ( RateLimiter ( TimeLimiter ( Bulkhead ( method() ) ) ) ) )
+	* sẽ triển khai circuit breaker, còn timlimiter và retry sẽ nghiên cứu và triển khai sau, bởi vì đang gặp một lỗi
+	do chưa nghiên cứu kĩ lập trình reactive. (lỗi không dừng được luồng chạy khi timeout, làm cho lỗi logic).
+	* sẽ nghiên cứu hủy CompletableFuture khi timeout sau.
+	* đối với api có gọi đến service khác, triền khai bất đồng bộ
+	* đối với api không gọi đến service khác, triền khai đồng bộ
 
+* Publisher, Subcriber, Subcription, Flux, Mono ?
+* Spring Cloud Sleuth ?
+	* Help Distributed Tracing.
+	* Help generate spanId and traceId for per request in application.
+* Zipkin
+	* for visualize the distributed tracing of application.
+	
 * spring web flux - cho lập trình reactive programing
 * spring cloud được xây trên spring webflux, chứ không phải spring web mvc
 * nếu bean cấu hình bằng method ,spring sẽ tạo ra bean với tên riêng là tên method, và chỉ khai báo đúng tên mới dùng đc.
@@ -177,4 +222,8 @@
 	* 2 phát triển cái mới
 		* thời gian phát triển ý tưởng và database và system khá lâu.
 		* chấp nhận lâu
+
+* CircuitBreaker bắt được runtime exception trong luồng nó thực thi.
+* controller advice không bắt được exception ở luồng khác.
+* tự code mapDto.
 		
