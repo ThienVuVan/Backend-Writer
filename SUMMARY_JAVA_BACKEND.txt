@@ -1110,6 +1110,105 @@ có thể dùng oracleJdk hoặc openJdk.
 * các class dto là các class thay thế cho bean, đại diện cho dữ liệu được đi ra ngoài, thế nên dữ liệu của Dto không nhất
 thiết phải giống các java beans, nó có thể là dữ liệu của các javabeans hợp lại, nó làm cho tránh việc truyền tải cả một
 javabeans ra ngoài, đôi khi gây đến nhiều lỗi không mong muốn và lộ dữ liệu.
+
+
+<<<<< LomBok Anotations >>>>>
+
+* @Getter : Generate Getter Method for all the field;
+* @Setter : Generate Setter Method for all the field;
+* @NoArgsConstructor  : Generate Constructor without paramter;
+* @AllArgsConstructor : Generate Constructor with all the field;
+* @RequiredArgsConstructor : Generate Constructor for all the field with final or @NonNull Constraint;
+* @ToString : Generate ToString Method for all the field;
+* @Data : Equivalent to @Getter @Setter @RequiredArgsConstructor @ToString @EqualsAndHashCode.
+
++ Note: Becareful when using @Data or @ToString, it can be make StackOverFlow error, because it call all the releventd things to print;
+
+
+
+
+* The Different between @NotNull and @NotBlank and @NotEmpty.
+@NotNull: a constrained CharSequence, Collection, Map, or Array is valid as long as it's not null, but it can be empty.
+@NotEmpty: a constrained CharSequence, Collection, Map, or Array is valid as long as it's not null, and its size/length is greater than zero.
+@NotBlank: a constrained String is valid as long as it's not null, and the trimmed length is greater than zero.
+
+@NotNull: có thể _dùng được cho hầu như tất cả các kiểu dữ liệu trong Java_, từ chối giá trị null hoặc không có nhưng chấp nhận giá trị rỗng. Note: Thậm chí annotation này có thể dùng được cho các kiểu dữ liệu nguyên thủy (int, long, float, double, char, byte...) mà không báo lỗi (mặc dù các kiểu nguyên thủy không thể null) nhưng mà nó sẽ không có tác dụng gì cả.
+
+@NotEmpty: có thể dùng được cho CharSequence (interface của String, StringBuffer và StringBuilder), Collection, Map, Array. Annotation này từ chối cả giá trị null lẫn giá trị rỗng bằng cách kiểm tra độ dài (length) (String) hoặc kích thước (size) (Collection) xem có lớn hơn 0 hay không.
+
+@NotBlank: có thể dùng được cho String. Annotation này từ chối String có giá trị null và String có độ dài là 0 sau khi đã trim (loại bỏ hết khoảng trắng thừa ở đầu và cuối của String)
+
+*
+=> @Size dùng để xác định kích thước (số lượng phần tử hoặc số ký tự) của trường (hoặc mảng, bộ sưu tập).
+=> @Length dùng để xác định số ký tự của trường (hoặc chuỗi).
+=> @Range dùng để xác định giá trị tối thiểu và tối đa của trường (áp dụng cho các loại dữ liệu có thể so sánh được như số nguyên, số thực).
+ ==>>> It All Works The Same;
+
+* Number Constraint
+=> @Negative: (Hibernate Validator)for Number and value have to be a negative number (nhỏ hơn 0).
+=> @NegativeOrZero: (Hibernate Validator)for Number and value have to be a negative number or equal to zero. (nhỏ hơn hoặc bằng 0)
+=> @Positive: (Hibernate Validator) for Numberand value have to be a positive number(lớn hơn 0).
+=> @PositiveOrZero: (Hibernate Validator) for Number and value have to be a positive number or equal to zero.(lớn hơn hoặc bằng 0).
+
+*
+=> @Digits: (Hibernate Validator) xác định số lượng chữ số tối đa sau dấu phẩy trong một số thập phân.
+	* Để sử dụng annotation @Digits, bạn cần cung cấp hai tham số:
+		* integer: Số chữ số tối đa trước dấu phẩy.
+		* fraction: Số chữ số tối đa sau dấu phẩy.
+
+=> @Future: (Hibernate Validator) for Time, must be future;
+=> @FutureOrPresent: (Hibernate Validator) for Time, must be future or present;
+=> @PastOrPresent: (Hibernate Validator) for Time, must be past or present;
+
+
+# DataSource
+#spring.datasource.url=jdbc:mysql://localhost:3306/bookstore
+#spring.datasource.username=root
+#spring.datasource.password=
+#spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Hibernate Properties
+#spring.jpa.show-sql=true
+#spring.jpa.hibernate.ddl-auto=update
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+#Turn off spring boot banner
+#spring.main.banner-mode=off
+
+#Reduce logging level => set logging to warn
+#logging.level.root=warn
+
+#Logging config to display sql statement
+#logging.level.org.hibernate.sql=debug
+#logging.level.org.hibernate.orm.jdbc.bind=trace
+#logging.level.org.springframework.security=debug
+
+			
+* Các bước để build một dự án spring boot.
+	* chuẩn bị Oracle JDK hoặc OpenJDK.
+	* sử dụng các ide hỗ trợ tạo spring boot hoặc sử dụng spring initialize.
+	* phân chia câu trúc thư mục dự án.
+	* liệt kê, tải các thư viện cần thiết.
+		* các thư viện của spring boot: springboot-starter, springboot data jpa, springboot security, springboot test,
+			springboot validation.
+		* các thư viện liên quan: database-connector, Log4j, Mapstruct, Swagger, spring boot devtools, lombok, jwt
+			oauth2(nếu triển khai).
+		* trong springboot data jpa có hibernate core, jdbc template ...
+		* trong springboot validation có hibernate validator.
+		* // còn nhiều tự vào thư viện tìm hiểu.
+	* code entity
+	* config file properties.
+	* chạy generate table trong database.
+	* config spring security.
+		* config CORS // accept all request from different domain or sepecific domain.
+		* // update.
+	* code and config jwt.
+	* triển khai luồng dữ liệu theo mô hình 3 lớp, repository, service, controller.
+
+
+	
+	
+
 	
 	
 	

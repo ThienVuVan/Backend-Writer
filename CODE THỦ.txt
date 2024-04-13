@@ -665,3 +665,29 @@ abstract. nhưng trong java8, một method mới được bổ sung vào interfa
 		* sẽ update thêm về sử lý đồng bộ trong bất đồng bộ.
 		* CompletableFuture chính nó giúp chạy ASynchronize task và cũng chính nó nhận result trả về từ ASynchronize task và nhiều method
 		để thực hiện tiếp (sẽ update các method sau).
+
+* OracleJDK và OpenJDK.
+	* ban đầu, chỉ có một mã bộ mã nguồn java duy nhất là jdk của sun microsystems, khi java được chuyển giao cho oracle
+		thì bộ mã nguồn java được đổi tên thành OracleJDK. được Oracle phát triển như một sản phẩm.
+	* Vì là Open Source, nên một cộng đồng đã đóng góp rất nhiều vào bộ mã nguồn java, và sinh ra một phiên bản có tên là
+		OpenJDK, OpenJDK cũng được được đội ngũ của oracle support phát triển, nhưng có một số tính năng của oraclejdk mà
+		openjdk không có, bản oraclejdk có đầy đủ liences nên có nhiều module được chấp nhận sử dụng trên nhiều môi trường
+		khác nhau, openjdk đôi khi không có điều này.
+	
+	* Một sự kiện lớn xẩy ra vào tháng 10 năm 2009, Oracle mua Sun Microsystem, như vậy Java đã chính thức thay đổi chủ sở hữu.
+		Hãy chú ý tới thời điểm trước và sau năm 2009.
+		
+	* Các phiên bản Java từ 1 đến 6 được phát triển bởi Sun Microsystem, họ mở mã nguồn của Java cho tất cả mọi người trên thế giới.
+		Tháng 7 năm 2011, Oracle phát hành Java 7, họ đã phát hành 2 biến thể khác nhau của JDK là Oracle JDK và OpenJDK,
+		thời điểm đó mã nguồn của 2 biến thể này không có quá nhiều sự khác biệt, bởi vì chúng đều được thừa kế từ JDK 6.
+
+	* OpenJDK được mở mã nguồn, nó được bảo trì và phát triển bởi Oracle, nhưng cho phép cộng đồng và các công ty khác tham
+		 gia vào sự phát triển này, chẳng hạn như Red Hat, Azul Systems, IBM, Apple Inc... OpenJDK vừa là một sản phẩm JDK
+		 vừa là một đặc tả (specification), bất kỳ một công ty, tổ chức nào muốn sử dụng OpenJDK để tạo ra một biến thể mới
+		 phải tuân thủ các đặc tả đó.
+	* OpenJDK được phát triển bởi Oracle và sự đóng góp từ cộng đồng, đôi khi chúng ta gặp vấn đề với sự ổn định, dựa trên
+		phản hồi của người dùng nó sẽ được nâng cấp để tốt hơn. OpenJDK được cập nhập thường xuyên, khoảng 6 tháng một lần.
+
+	* Oracle JDK được bảo trì và phát triển bởi Oracle, và tuân thủ các đặc tả của OpenJDK, nhưng nó không được mở mã nguồn.
+		Oracle JDK tốt hơn nhiều về khả năng đáp ứng và hiệu năng JVM. Nó tập trung nhiều hơn vào sự ổn định do tầm quan trọng
+		của nó đối với khách hàng doanh nghiệp của mình.
